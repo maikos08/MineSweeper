@@ -17,7 +17,7 @@ public class BoardPresenter {
         initializeDisplay();
     }
 
-    private void initializeNewGame() {
+    public void initializeNewGame() {
         game = new Game(game.difficulty());
         display.show(game);
     }
