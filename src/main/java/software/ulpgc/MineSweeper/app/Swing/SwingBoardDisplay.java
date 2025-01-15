@@ -18,6 +18,9 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     private final Map<String, ImageIcon> images;
     private final Map<String, Clicked> eventListeners = new HashMap<>();
 
+    private int row;
+    private int col;
+
     public SwingBoardDisplay(Game game) {
         this.game = game;
         this.images = loadIcons();
@@ -71,8 +74,10 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     private void drawCell(Graphics g, Cell cell, Square square) {
         ImageIcon icon;
         if (cell.isRevealed()) {
-            if (cell.hasMine()) {
+            if (cell.hasMine()  && cell == game.board().cells()[row][col]) {
                 icon = images.get("mineSelected");
+            }else if (cell.hasMine()){
+                icon = images.get("mine");
             } else {
                 String adjacent = String.valueOf(cell.adjacentMines());
                 icon = images.getOrDefault(adjacent, images.get("revealed"));
@@ -95,8 +100,8 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = toRow(e.getY());
-                int col = toColumn(e.getX());
+                row = toRow(e.getY());
+                col = toColumn(e.getX());
 
                 if (row >= 0 && col >= 0 && row < game.board().rows() && col < game.board().columns()) {
                     Clicked leftClick = eventListeners.get("cell-click");
@@ -138,6 +143,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
 
     @Override
     public void showLose() {
+        game = game.revealMines();
     }
 
     @Override
