@@ -104,4 +104,14 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         }
         return sb.toString();
     }
+
+    public Board revealMines() {
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells[1].length; j++) {
+                if (cells[i][j].hasMine())
+                    cells[i][j] = new Cell(cells[i][j].hasMine(), false, true, cells[i][j].adjacentMines());
+            }
+        }
+        return new Board(rows, columns, mineCount, cells);
+    }
 }
