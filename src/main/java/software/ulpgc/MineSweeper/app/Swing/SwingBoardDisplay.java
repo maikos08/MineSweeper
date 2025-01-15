@@ -137,6 +137,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
 
     @Override
     public void showLose() {
+        game = game.revealMines();
         JOptionPane.showMessageDialog(this, "You lose!");
     }
 
