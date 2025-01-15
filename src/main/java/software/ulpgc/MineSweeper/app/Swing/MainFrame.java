@@ -73,7 +73,7 @@ public class MainFrame extends JFrame {
 
         Map<String, ImageIcon> icons = new HashMap<>();
         try {
-            icons.put("facedefault", new ImageIcon("src/images/face image.png"));
+            icons.put("facedefault", new ImageIcon("src/images/face_image.png"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
