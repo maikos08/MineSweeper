@@ -10,12 +10,37 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
-    private static final int WINDOW_WIDTH = 800;
-    private static final int WINDOW_HEIGHT = 800;
+    private static int WINDOW_WIDTH = 800;
+    private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
     private SwingBoardDisplay boardDisplay;
+    private Difficulty difficulty = Difficulty.EASY;
+
 
     public MainFrame() {
+        
+        setResizable(false);
+
+
+        switch (this.difficulty) {
+            case EASY -> {
+                WINDOW_WIDTH = 400;
+                WINDOW_HEIGHT = 400;
+                break;
+            }
+            case MEDIUM -> {
+                WINDOW_WIDTH = 600;
+                WINDOW_HEIGHT = 600;
+                break;
+            }
+            case HARD -> {
+                WINDOW_WIDTH = 1200;
+                WINDOW_HEIGHT = 800;
+                break;
+            }
+        }
+
+
         setupMainFrame();
         initializeGame();
     }
@@ -29,7 +54,6 @@ public class MainFrame extends JFrame {
     }
 
     private void initializeGame() {
-        Difficulty difficulty = Difficulty.EASY; 
         Game game = new Game(difficulty);
         boardDisplay = new SwingBoardDisplay(game);
         presenter = new BoardPresenter(boardDisplay, game);
@@ -42,5 +66,14 @@ public class MainFrame extends JFrame {
             MainFrame mainFrame = new MainFrame();
             mainFrame.setVisible(true);
         });
+    }
+    
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
     }
 }
