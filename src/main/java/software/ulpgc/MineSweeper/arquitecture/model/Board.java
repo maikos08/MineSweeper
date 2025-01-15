@@ -22,8 +22,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
             }
         }
         Cell[][] cellsWithMines = minePlacer.placeMines(cells, mineCount);
-
-        //Cell[][] cellsWithMines = new Cell[0][];
         return mineCounter.countAdjacentMines(cellsWithMines);
     }
 
@@ -48,13 +46,10 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
             return;
         }
 
-        // Mark as visited
         visited[row][col] = true;
 
-        // Reveal the cell
         updatedCells[row][col] = cell.reveal();
 
-        // If the cell has no adjacent mines, reveal its neighbors
         if (cell.adjacentMines() == 0) {
             for (int i = row - 1; i <= row + 1; i++) {
                 for (int j = col - 1; j <= col + 1; j++) {

@@ -24,7 +24,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         commands = new HashMap<>();
-        setResizable(false);  // Permitir que se pueda cambiar el tamaño
+        setResizable(true);  // Permitir que se pueda cambiar el tamaño
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
@@ -71,9 +71,20 @@ public class MainFrame extends JFrame {
         JLabel mineCounter = new JLabel("Mines: 10", SwingConstants.CENTER);
         mineCounter.setPreferredSize(new Dimension(100, 30));
 
-        JButton resetButton = new JButton(":)");
+        Map<String, ImageIcon> icons = new HashMap<>();
+        try {
+            icons.put("facedefault", new ImageIcon("src/images/face_image.png"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        ImageIcon originalIcon = icons.get("facedefault");
+        Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon finalIcon = new ImageIcon(scaledImage);
+
+        JButton resetButton = new JButton(finalIcon);
         resetButton.setFocusPainted(false);
-        resetButton.setPreferredSize(new Dimension(50, 30));
+        resetButton.setPreferredSize(new Dimension(50, 50));
         resetButton.addActionListener(e -> {
             // Reinicia el juego con la nueva dificultad seleccionada
             initializeGame(difficulty);
