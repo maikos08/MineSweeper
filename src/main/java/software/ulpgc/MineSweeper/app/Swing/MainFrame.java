@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
     private static final int WINDOW_WIDTH = 800;
-    private static final int WINDOW_HEIGHT = 600;
+    private static final int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
     private SwingBoardDisplay boardDisplay;
 
@@ -29,7 +29,7 @@ public class MainFrame extends JFrame {
     }
 
     private void initializeGame() {
-        Difficulty difficulty = Difficulty.EASY; // Default difficulty
+        Difficulty difficulty = Difficulty.EASY; 
         Game game = new Game(difficulty);
         boardDisplay = new SwingBoardDisplay(game);
         presenter = new BoardPresenter(boardDisplay, game);
