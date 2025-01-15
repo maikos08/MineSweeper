@@ -32,6 +32,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
             icons.put("flag", new ImageIcon("src/images/flag.png"));
             icons.put("mine", new ImageIcon("src/images/mine.png"));
             icons.put("revealed", new ImageIcon("src/images/revealed.png"));
+            icons.put("mineSelected", new ImageIcon("src/images/mineSelected.png"));
             for (int i = 1; i <= 8; i++) {
                 icons.put(String.valueOf(i), new ImageIcon("src/images/" + i + ".png"));
             }
@@ -71,7 +72,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
         ImageIcon icon;
         if (cell.isRevealed()) {
             if (cell.hasMine()) {
-                icon = images.get("mine");
+                icon = images.get("mineSelected");
             } else {
                 String adjacent = String.valueOf(cell.adjacentMines());
                 icon = images.getOrDefault(adjacent, images.get("revealed"));
@@ -137,7 +138,6 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
 
     @Override
     public void showLose() {
-        JOptionPane.showMessageDialog(this, "You lose!");
     }
 
     @Override
