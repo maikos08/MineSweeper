@@ -58,7 +58,6 @@ public class MainFrame extends JFrame {
         JButton resetButton = new JButton(":)");
         resetButton.setFocusPainted(false);
         resetButton.setPreferredSize(new Dimension(50, 30));
-        //add reset method
         resetButton.addActionListener(e ->{
             presenter.initializeNewGame();
         });
@@ -79,13 +78,6 @@ public class MainFrame extends JFrame {
         presenter = new BoardPresenter(boardDisplay, game);
 
         add(boardDisplay, BorderLayout.CENTER);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainFrame mainFrame = new MainFrame();
-            mainFrame.setVisible(true);
-        });
     }
 
     public Difficulty getDifficulty() {
