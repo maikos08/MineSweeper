@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SwingBoardDisplay extends JPanel implements BoardDisplay {
-    private final Game game;
+    private Game game;
     private final Map<String, ImageIcon> images;
-    private Position selectedPosition;
+    private final Map<String, Clicked> eventListeners = new HashMap<>();
 
     public SwingBoardDisplay(Game game) {
         this.game = game;
@@ -31,7 +31,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
             icons.put("default", new ImageIcon("src/images/default.png"));
             icons.put("flag", new ImageIcon("src/images/flag.png"));
             icons.put("mine", new ImageIcon("src/images/mine.png"));
-            icons.put("revealed", new ImageIcon("src/images/Revealed.png"));
+            icons.put("revealed", new ImageIcon("src/images/revealed.png"));
             for (int i = 1; i <= 8; i++) {
                 icons.put(String.valueOf(i), new ImageIcon("src/images/" + i + ".png"));
             }
@@ -43,12 +43,13 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     }
 
     @Override
-    public void show(Board board) {
+    public void show(Game game) {
+        this.game = game;
         repaint();
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    public void paint(Graphics g) {
         super.paintComponent(g);
         drawBoard(g);
     }
@@ -84,7 +85,6 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
         if (icon != null) {
             g.drawImage(icon.getImage(), square.x(), square.y(), square.length(), square.length(), this);
         } else {
-            // Fallback in case of missing image
             g.setColor(Color.DARK_GRAY);
             g.fillRect(square.x(), square.y(), square.length(), square.length());
         }
@@ -97,10 +97,18 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
                 int row = toRow(e.getY());
                 int col = toColumn(e.getX());
 
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    System.out.println("Row: " + row + " Col: " + col);
-                } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    System.out.println("Right click");
+                if (row >= 0 && col >= 0 && row < game.board().rows() && col < game.board().columns()) {
+                    Clicked leftClick = eventListeners.get("cell-click");
+                    Clicked rightClick = eventListeners.get("cell-right-click");
+
+                    
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+                        leftClick.on(new Point(col, row));
+                    } else if (SwingUtilities.isRightMouseButton(e)) {
+                        rightClick.on(new Point(col, row));
+
+                    }
+
                 }
             }
         };
@@ -122,9 +130,6 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
         return (x - 5) / getCellWidth();
     }
 
-    private record Position(int x, int y) {
-    }
-
     @Override
     public void showWin() {
         JOptionPane.showMessageDialog(this, "You win!");
@@ -136,8 +141,8 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     }
 
     @Override
-    public void on(Clicked clicked) {
-        System.out.println("Clicked");
+    public void on(String event, Clicked clicked) {
+        eventListeners.put(event, clicked);
     }
 
     private record Square(int x, int y, int length) {

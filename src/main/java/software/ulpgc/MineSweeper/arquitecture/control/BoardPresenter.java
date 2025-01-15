@@ -1,5 +1,7 @@
 package software.ulpgc.MineSweeper.arquitecture.control;
 
+import java.awt.geom.Point2D;
+
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
@@ -16,16 +18,20 @@ public class BoardPresenter {
     }
 
     private void initializeDisplay() {
-        display.on(this::handleCellClick);
-        display.show(game.board());
+        display.on("cell-click", this::handleCellClick);
+        display.on("cell-right-click", this::handleCellClickRigth);
+        display.show(game);
     }
 
-    private void handleCellClick(int offset) {
+    private void handleCellClick(Point2D point) {
+
+        System.out.println("Clicked on " + point);
+
+        int row = (int) point.getY();
+        int col = (int) point.getX();
+
         int rows = game.board().rows();
         int columns = game.board().columns();
-
-        int row = offset / columns;
-        int col = offset % columns;
 
         if (row < rows && col < columns) {
             updateGameBoard(row, col);
@@ -34,18 +40,51 @@ public class BoardPresenter {
         switch (game.checkStatus()) {
             case GameStatus.Win -> display.showWin();
             case GameStatus.Lose -> display.showLose();
-            case GameStatus.Current -> display.show(game.board());
+            case GameStatus.Current -> display.show(game);
         }
 
     }
 
+    private void handleCellClickRigth(Point2D point) {
+        System.out.println("Clicked on " + point);
+
+        int row = (int) point.getY();
+        int col = (int) point.getX();
+
+        int rows = game.board().rows();
+        int columns = game.board().columns();
+
+        if (row < rows && col < columns) {
+            setFlag(row, col);
+        }
+
+        switch (game.checkStatus()) {
+            case GameStatus.Win -> display.showWin();
+            case GameStatus.Lose -> display.showLose();
+            case GameStatus.Current -> display.show(game);
+        }
+    }
+
+    private void setFlag(int row, int col) {
+        Board updatedBoard = game.board().setFlag(row, col);
+
+        System.out.println("Updated board: ");
+        System.out.println(updatedBoard);
+
+        this.game = game.updateBoard(updatedBoard);
+
+        display.show(game);
+    }
+
     private void updateGameBoard(int row, int col) {
         Board updatedBoard = game.board().updateCell(row, col);
-        game = game.updateBoard(updatedBoard);
 
-        
+        System.out.println("Updated board: ");
+        System.out.println(updatedBoard);
 
-        display.show(updatedBoard);
+        this.game = game.updateBoard(updatedBoard);
+
+        display.show(game);
     }
 
     public Game getGame() {
@@ -57,13 +96,13 @@ public class BoardPresenter {
 
         game = game.updateBoard(updatedBoard);
 
-        display.show(updatedBoard);
+        display.show(game);
     }
 
     public void updateGame(Game newGame) {
         this.game = newGame;
 
-        display.show(newGame.board());
+        display.show(game);
     }
 
 }
