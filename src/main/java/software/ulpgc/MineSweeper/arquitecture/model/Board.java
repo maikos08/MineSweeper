@@ -27,20 +27,40 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
     }
 
     public Board updateCell(int row, int col) {
-        Cell cell = cells[row][col];
-        if (cell.isRevealed() || cell.isFlagged()) {
-            return this;
-        }
-
-        Cell updatedCell = cell.reveal();
+        boolean[][] visited = new boolean[rows][columns];
         Cell[][] updatedCells = Arrays.stream(cells)
                 .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
                 .toArray(Cell[][]::new);
-        updatedCells[row][col] = updatedCell;
 
-   
+        revealCells(row, col, updatedCells, visited);
 
         return new Board(rows, columns, mineCount, updatedCells);
+    }
+
+    private void revealCells(int row, int col, Cell[][] updatedCells, boolean[][] visited) {
+        if (row < 0 || row >= rows || col < 0 || col >= columns || visited[row][col]) {
+            return;
+        }
+
+        Cell cell = updatedCells[row][col];
+        if (cell.isRevealed() || cell.isFlagged()) {
+            return;
+        }
+
+        // Mark as visited
+        visited[row][col] = true;
+
+        // Reveal the cell
+        updatedCells[row][col] = cell.reveal();
+
+        // If the cell has no adjacent mines, reveal its neighbors
+        if (cell.adjacentMines() == 0) {
+            for (int i = row - 1; i <= row + 1; i++) {
+                for (int j = col - 1; j <= col + 1; j++) {
+                    revealCells(i, j, updatedCells, visited);
+                }
+            }
+        }
     }
 
     public Board setFlag(int row, int col) {
@@ -58,7 +78,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         return new Board(rows, columns, mineCount, updatedCells);
     }
 
-
     public int adjacentMines(int row, int col) {
         int count = 0;
         for (int i = row - 1; i <= row + 1; i++) {
@@ -72,7 +91,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         }
         return count;
     }
-
 
     @Override
     public String toString() {

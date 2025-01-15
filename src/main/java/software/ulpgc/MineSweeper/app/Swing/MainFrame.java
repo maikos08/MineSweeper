@@ -12,7 +12,7 @@ public class MainFrame extends JFrame {
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
     private SwingBoardDisplay boardDisplay;
-    private Difficulty difficulty = Difficulty.EASY;
+    private Difficulty difficulty = Difficulty.MEDIUM;
 
     public MainFrame() {
         setResizable(false);
