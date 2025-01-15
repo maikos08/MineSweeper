@@ -1,6 +1,5 @@
 package software.ulpgc.MineSweeper.arquitecture.services.game;
 
-import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 
 public class MineCounter {
