@@ -54,6 +54,11 @@ public class FileImageLoader implements ImageLoader {
                 public String toString() {
                     return file.getAbsolutePath();
                 }
+
+                @Override
+                public java.awt.Image image() {
+                    return null;
+                }
             };
             images.put(file.getName(), image);
         } catch (IOException e) {

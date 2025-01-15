@@ -1,7 +1,6 @@
 package software.ulpgc.MineSweeper.arquitecture.control;
 
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
-import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;

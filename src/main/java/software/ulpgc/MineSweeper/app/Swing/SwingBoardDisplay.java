@@ -1,86 +1,109 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
-import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
-import software.ulpgc.MineSweeper.arquitecture.control.Command;
-import software.ulpgc.MineSweeper.arquitecture.control.ToggleFlagCommand;
-import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
-import software.ulpgc.MineSweeper.arquitecture.model.Image;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
-import static com.sun.java.accessibility.util.AWTEventMonitor.addMouseListener;
-
 public class SwingBoardDisplay extends JPanel implements BoardDisplay {
-    private final BoardPresenter presenter;
     private final Game game;
-    private software.ulpgc.MineSweeper.arquitecture.model.Cell[][] cells;
-    private Map<String, Image> images;
+    private final Map<String, ImageIcon> images;
     private Position selectedPosition;
 
-    public SwingBoardDisplay(BoardPresenter presenter, Game game) {
-        this.presenter = presenter;
+    public SwingBoardDisplay(Game game) {
         this.game = game;
-        this.cells = game.board().cells();
-        loadIcons();
-        addMouseListener(createMouseListener());
+        this.images = loadIcons();
         setDoubleBuffered(true);
+        addMouseListener(createMouseListener());
     }
 
-    private void loadIcons() {
-        images = new FileImageLoader().load();
+    private Map<String, ImageIcon> loadIcons() {
+        Map<String, ImageIcon> icons = new HashMap<>();
+        try {
+            icons.put("default", new ImageIcon("src/images/default.png"));
+            icons.put("flag", new ImageIcon("src/images/flag.png"));
+            icons.put("mine", new ImageIcon("src/images/mine.png"));
+            icons.put("revealed", new ImageIcon("src/images/Revealed.png"));
+            for (int i = 1; i <= 8; i++) {
+                icons.put(String.valueOf(i), new ImageIcon("src/images/" + i + ".png"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading images: " + e.getMessage());
+        }
+        return icons;
     }
 
     @Override
     public void show(Board board) {
-        this.cells = board.cells();
         repaint();
-    }
-
-    @Override
-    public void on(Clicked clicked) {
-
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        drawBoard(g);
+    }
+
+    private void drawBoard(Graphics g) {
         int cellWidth = getCellWidth();
         int cellHeight = getCellHeight();
 
         for (int row = 0; row < game.board().rows(); row++) {
             for (int col = 0; col < game.board().columns(); col++) {
-                int x = col * cellWidth + 5;
-                int y = row * cellHeight + 5;
-                software.ulpgc.MineSweeper.arquitecture.model.Cell current = cells[row][col];
-
-                if (selectedPosition != null && (selectedPosition.x == row && selectedPosition.y == col)) {
-                    paintSelectedCell(g, x, y, cellWidth, cellHeight);
-                } else if (current.isRevealed()) {
-                    if (current.hasMine()) {
-                        try {
-                            paintMine(g, x, y, cellWidth, cellHeight);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else {
-                        paintCounter(g, current, x, y, cellWidth, cellHeight);
-                    }
-                } else if (current.isFlagged()) {
-                    paintFlag(g, x, y, cellWidth, cellHeight);
-                } else {
-                    paintNoneRevealedCell(g, x, y, cellWidth, cellHeight);
-                }
+                Cell cell = game.board().cells()[row][col];
+                Square square = new Square(col * cellWidth + 5, row * cellHeight + 5, cellWidth);
+                drawCell(g, cell, square);
             }
         }
+    }
+
+    private void drawCell(Graphics g, Cell cell, Square square) {
+        ImageIcon icon;
+        if (cell.isRevealed()) {
+            if (cell.hasMine()) {
+                icon = images.get("mine");
+            } else {
+                String adjacent = String.valueOf(cell.adjacentMines());
+                icon = images.getOrDefault(adjacent, images.get("revealed"));
+            }
+        } else if (cell.isFlagged()) {
+            icon = images.get("flag");
+        } else {
+            icon = images.get("default");
+        }
+
+        if (icon != null) {
+            g.drawImage(icon.getImage(), square.x(), square.y(), square.length(), square.length(), this);
+        } else {
+            // Fallback in case of missing image
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(square.x(), square.y(), square.length(), square.length());
+        }
+    }
+
+    private MouseListener createMouseListener() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = toRow(e.getY());
+                int col = toColumn(e.getX());
+
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    System.out.println("Row: " + row + " Col: " + col);
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    System.out.println("Right click");
+                }
+            }
+        };
     }
 
     private int getCellWidth() {
@@ -91,83 +114,12 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
         return (getHeight() - 10) / game.board().rows();
     }
 
-    private void paintSelectedCell(Graphics g, int x, int y, int cellWidth, int cellHeight) {
-        g.drawImage((java.awt.Image) images.get("Revealed.png"), x, y, cellWidth, cellHeight, null);
-        g.setColor(Color.black);
-        g.drawRect(x, y, cellWidth, cellHeight);
-    }
-
-    private void paintFlag(Graphics g, int x, int y, int cellWidth, int cellHeight) {
-        paintNoneRevealedCell(g, x, y, cellWidth, cellHeight);
-        g.drawImage((java.awt.Image) images.get("flag.png"), x, y, cellWidth, cellHeight, null);
-    }
-
-    private void paintMine(Graphics g, int x, int y, int cellWidth, int cellHeight) throws IOException {
-        g.drawImage((java.awt.Image) images.get("mine.png"), x + cellWidth / 4, y + cellHeight / 4, cellWidth / 2,
-                cellHeight / 2, null);
-        g.setColor(Color.black);
-        g.drawRect(x, y, cellWidth, cellHeight);
-    }
-
-    private void paintCounter(Graphics g, software.ulpgc.MineSweeper.arquitecture.model.Cell current, int x, int y,
-            int cellWidth, int cellHeight) {
-        if (current.adjacentMines() > 0) {
-            String result = current.adjacentMines() + ".png";
-            g.drawImage((java.awt.Image) images.get(result), x + cellWidth / 4, y + cellHeight / 4, cellWidth / 2,
-                    cellHeight / 2, null);
-        }
-        g.setColor(Color.black);
-        g.drawRect(x, y, cellWidth, cellHeight);
-    }
-
-    private void paintNoneRevealedCell(Graphics g, int x, int y, int cellWidth, int cellHeight) {
-        g.drawImage((java.awt.Image) images.get("Default.png"), x, y, cellWidth, cellHeight, null);
-        g.setColor(Color.black);
-        g.drawRect(x, y, cellWidth, cellHeight);
-    }
-
     private int toRow(int y) {
         return (y - 5) / getCellHeight();
     }
 
     private int toColumn(int x) {
         return (x - 5) / getCellWidth();
-    }
-
-    private MouseListener createMouseListener() {
-        return new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int currentRow = toRow(e.getY());
-                int currentColumn = toColumn(e.getX());
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    
-                } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    // no se que hacer
-                }
-                repaint();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                selectedPosition = new Position(toRow(e.getY()), toColumn(e.getX()));
-                repaint();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                selectedPosition = null;
-                repaint();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-        };
     }
 
     private record Position(int x, int y) {
@@ -181,5 +133,13 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     @Override
     public void showLose() {
         JOptionPane.showMessageDialog(this, "You lose!");
+    }
+
+    @Override
+    public void on(Clicked clicked) {
+        System.out.println("Clicked");
+    }
+
+    private record Square(int x, int y, int length) {
     }
 }

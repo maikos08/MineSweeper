@@ -17,7 +17,6 @@ public class RevealCellCommand {
             return;
         }
 
-        Cell updatedCell = cell.reveal();
         presenter.updateCell(row, col);
     }
 }
