@@ -23,5 +23,8 @@ public record Cell(boolean hasMine, boolean isFlagged, boolean isRevealed, int a
         }
         return new Cell(this.hasMine, !this.isFlagged, false, this.adjacentMines);
     }
-}
 
+    public Cell withAdjacentMines(int adjacentMines) {
+        return new Cell(this.hasMine, this.isFlagged, this.isRevealed, adjacentMines);
+    }
+}

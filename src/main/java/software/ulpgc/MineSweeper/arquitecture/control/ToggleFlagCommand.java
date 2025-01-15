@@ -15,6 +15,6 @@ public class ToggleFlagCommand {
         Cell cell = presenter.getGame().board().cells()[row][col];
 
         Cell updatedCell = cell.toggleFlag();
-        presenter.updateCell(row, col, updatedCell);
+        presenter.updateCell(row, col);
     }
 }
