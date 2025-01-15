@@ -151,12 +151,6 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainFrame mainFrame = new MainFrame();
-            mainFrame.setVisible(true);
-        });
-    }
 
     public Difficulty getDifficulty() {
         return difficulty;
