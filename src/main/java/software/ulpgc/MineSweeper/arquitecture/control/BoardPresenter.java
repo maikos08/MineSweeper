@@ -17,6 +17,11 @@ public class BoardPresenter {
         initializeDisplay();
     }
 
+    private void initializeNewGame() {
+        game = new Game(game.difficulty());
+        display.show(game);
+    }
+
     private void initializeDisplay() {
         display.on("cell-click", this::handleCellClick);
         display.on("cell-right-click", this::handleCellClickRigth);
@@ -24,6 +29,9 @@ public class BoardPresenter {
     }
 
     private void handleCellClick(Point2D point) {
+        if (game.checkStatus() != GameStatus.Current) {
+            return;
+        }
 
         System.out.println("Clicked on " + point);
 
@@ -46,6 +54,10 @@ public class BoardPresenter {
     }
 
     private void handleCellClickRigth(Point2D point) {
+        if (game.checkStatus() != GameStatus.Current) {
+            return;
+        }
+        
         System.out.println("Clicked on " + point);
 
         int row = (int) point.getY();
