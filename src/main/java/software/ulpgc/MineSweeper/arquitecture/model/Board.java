@@ -23,6 +23,7 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         }
         Cell[][] cellsWithMines = minePlacer.placeMines(cells, mineCount);
 
+        //Cell[][] cellsWithMines = new Cell[0][];
         return mineCounter.countAdjacentMines(cellsWithMines);
     }
 

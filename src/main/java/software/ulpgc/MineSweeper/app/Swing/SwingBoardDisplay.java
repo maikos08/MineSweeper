@@ -18,6 +18,9 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     private final Map<String, ImageIcon> images;
     private final Map<String, Clicked> eventListeners = new HashMap<>();
 
+    private int row;
+    private int col;
+
     public SwingBoardDisplay(Game game) {
         this.game = game;
         this.images = loadIcons();
@@ -32,6 +35,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
             icons.put("flag", new ImageIcon("src/images/flag.png"));
             icons.put("mine", new ImageIcon("src/images/mine.png"));
             icons.put("revealed", new ImageIcon("src/images/revealed.png"));
+            icons.put("mineSelected", new ImageIcon("src/images/mineSelected.png"));
             for (int i = 1; i <= 8; i++) {
                 icons.put(String.valueOf(i), new ImageIcon("src/images/" + i + ".png"));
             }
@@ -70,7 +74,9 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     private void drawCell(Graphics g, Cell cell, Square square) {
         ImageIcon icon;
         if (cell.isRevealed()) {
-            if (cell.hasMine()) {
+            if (cell.hasMine()  && cell == game.board().cells()[row][col]) {
+                icon = images.get("mineSelected");
+            }else if (cell.hasMine()){
                 icon = images.get("mine");
             } else {
                 String adjacent = String.valueOf(cell.adjacentMines());
@@ -94,8 +100,8 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = toRow(e.getY());
-                int col = toColumn(e.getX());
+                row = toRow(e.getY());
+                col = toColumn(e.getX());
 
                 if (row >= 0 && col >= 0 && row < game.board().rows() && col < game.board().columns()) {
                     Clicked leftClick = eventListeners.get("cell-click");
@@ -138,7 +144,6 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     @Override
     public void showLose() {
         game = game.revealMines();
-        JOptionPane.showMessageDialog(this, "You lose!");
     }
 
     @Override
