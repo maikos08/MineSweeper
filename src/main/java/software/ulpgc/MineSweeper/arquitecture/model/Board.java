@@ -38,8 +38,26 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
                 .toArray(Cell[][]::new);
         updatedCells[row][col] = updatedCell;
 
+   
+
         return new Board(rows, columns, mineCount, updatedCells);
     }
+
+    public Board setFlag(int row, int col) {
+        Cell cell = cells[row][col];
+        if (cell.isRevealed()) {
+            return this;
+        }
+
+        Cell updatedCell = cell.toggleFlag();
+        Cell[][] updatedCells = Arrays.stream(cells)
+                .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
+                .toArray(Cell[][]::new);
+        updatedCells[row][col] = updatedCell;
+
+        return new Board(rows, columns, mineCount, updatedCells);
+    }
+
 
     public int adjacentMines(int row, int col) {
         int count = 0;
@@ -55,40 +73,16 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         return count;
     }
 
-    public static void main(String[] args) {
-        // Create a Board instance
-        int rows = 5;
-        int columns = 5;
-        int mineCount = 5;
 
-        Board board = new Board(rows, columns, mineCount);
-
-        System.out.println("Initial Board:");
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                Cell cell = board.cells()[i][j];
-                System.out.print(cell.hasMine() ? "M " : ". ");
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Cell[] row : cells) {
+            for (Cell cell : row) {
+                sb.append(cell.isRevealed() ? (cell.hasMine() ? "X" : cell.adjacentMines()) : ".");
             }
-            System.out.println();
+            sb.append("\n");
         }
-
-        System.out.println("\nUpdating cell at (2, 2)...");
-        board = board.updateCell(2, 2);
-
-        System.out.println("Updated Board:");
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                Cell cell = board.cells()[i][j];
-                if (cell.isRevealed()) {
-                    System.out.print(cell.adjacentMines() + " ");
-                } else if (cell.hasMine()) {
-                    System.out.print("M ");
-                } else {
-                    System.out.print(". ");
-                }
-            }
-            System.out.println();
-        }
+        return sb.toString();
     }
-
 }

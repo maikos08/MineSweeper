@@ -1,7 +1,5 @@
 package software.ulpgc.MineSweeper.arquitecture.model;
 
-import software.ulpgc.MineSweeper.arquitecture.control.Observer;
-
 public record Game(Board board, Difficulty difficulty, GameStatus gameStatus) {
 
     public Game(Difficulty difficulty) {
