@@ -103,15 +103,18 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     }
 
     private void paintMine(Graphics g, int x, int y, int cellWidth, int cellHeight) throws IOException {
-        g.drawImage((java.awt.Image) images.get("mine.png"), x + cellWidth / 4, y + cellHeight / 4, cellWidth / 2, cellHeight / 2, null);
+        g.drawImage((java.awt.Image) images.get("mine.png"), x + cellWidth / 4, y + cellHeight / 4, cellWidth / 2,
+                cellHeight / 2, null);
         g.setColor(Color.black);
         g.drawRect(x, y, cellWidth, cellHeight);
     }
 
-    private void paintCounter(Graphics g, software.ulpgc.MineSweeper.arquitecture.model.Cell current, int x, int y, int cellWidth, int cellHeight) {
+    private void paintCounter(Graphics g, software.ulpgc.MineSweeper.arquitecture.model.Cell current, int x, int y,
+            int cellWidth, int cellHeight) {
         if (current.adjacentMines() > 0) {
             String result = current.adjacentMines() + ".png";
-            g.drawImage((java.awt.Image) images.get(result), x + cellWidth / 4, y + cellHeight / 4, cellWidth / 2, cellHeight / 2, null);
+            g.drawImage((java.awt.Image) images.get(result), x + cellWidth / 4, y + cellHeight / 4, cellWidth / 2,
+                    cellHeight / 2, null);
         }
         g.setColor(Color.black);
         g.drawRect(x, y, cellWidth, cellHeight);
@@ -138,7 +141,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
                 int currentRow = toRow(e.getY());
                 int currentColumn = toColumn(e.getX());
                 if (e.getButton() == MouseEvent.BUTTON1) {
-                    // No se q hacer
+                    
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     // no se que hacer
                 }
@@ -158,12 +161,25 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
             }
 
             @Override
-            public void mouseEntered(MouseEvent e) {}
+            public void mouseEntered(MouseEvent e) {
+            }
 
             @Override
-            public void mouseExited(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {
+            }
         };
     }
 
-    private record Position(int x, int y) {}
+    private record Position(int x, int y) {
+    }
+
+    @Override
+    public void showWin() {
+        JOptionPane.showMessageDialog(this, "You win!");
+    }
+
+    @Override
+    public void showLose() {
+        JOptionPane.showMessageDialog(this, "You lose!");
+    }
 }

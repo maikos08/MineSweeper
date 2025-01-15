@@ -8,16 +8,22 @@ public interface BoardDisplay {
 
     void on(Clicked clicked);
 
-    record Cell(int x, int y, int length){
+    record Cell(int x, int y, int length) {
         public boolean isAt(int x, int y) {
             return Math.abs(x - this.x) < length
                     && Math.abs(y - this.y) < length;
         }
     }
 
-    interface Clicked{
-        Clicked Null = offset -> {};
-        void  offset(int offset);
+    interface Clicked {
+        Clicked Null = offset -> {
+        };
+
+        void offset(int offset);
     }
+
+    public void showWin();
+
+    public void showLose();
 
 }

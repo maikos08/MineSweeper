@@ -63,7 +63,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
 
         Board board = new Board(rows, columns, mineCount);
 
-        // Print the initial state of the board
         System.out.println("Initial Board:");
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
@@ -73,11 +72,9 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
             System.out.println();
         }
 
-        // Test updating a cell
         System.out.println("\nUpdating cell at (2, 2)...");
         board = board.updateCell(2, 2);
 
-        // Print the updated state of the board
         System.out.println("Updated Board:");
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {

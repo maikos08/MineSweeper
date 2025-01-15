@@ -3,6 +3,7 @@ package software.ulpgc.MineSweeper.arquitecture.control;
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
+import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
 
 public class BoardPresenter {
@@ -27,25 +28,23 @@ public class BoardPresenter {
         int row = offset / columns;
         int col = offset % columns;
 
-        Cell cell = game.board().cells()[row][col];
-
-        if (cell.isRevealed()) {
-            return;
-        }
-
-        if (cell.isFlagged()) {
-            Cell updatedCell = cell.toggleFlag();
+        if (row < rows && col < columns) {
             updateGameBoard(row, col);
-            return;
         }
 
-        Cell updatedCell = cell.reveal();
-        updateGameBoard(row, col);
+        switch (game.checkStatus()) {
+            case GameStatus.Win -> display.showWin();
+            case GameStatus.Lose -> display.showLose();
+            case GameStatus.Current -> display.show(game.board());
+        }
+
     }
 
     private void updateGameBoard(int row, int col) {
         Board updatedBoard = game.board().updateCell(row, col);
         game = game.updateBoard(updatedBoard);
+
+        
 
         display.show(updatedBoard);
     }

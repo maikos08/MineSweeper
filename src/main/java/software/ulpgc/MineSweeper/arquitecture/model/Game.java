@@ -9,16 +9,36 @@ public record Game(Board board, Difficulty difficulty, GameStatus gameStatus) {
                 new Board(
                         difficulty.getRows(),
                         difficulty.getColumns(),
-                        difficulty.getMineCount()
-                ),
+                        difficulty.getMineCount()),
                 difficulty,
-                GameStatus.Current
-        );
+                GameStatus.Current);
     }
 
-    private GameStatus updateGameStatus(Board board) {
-        // Logic to determine if the game is won, lost, or ongoing
-        return gameStatus; // Placeholder
+    public GameStatus checkStatus() {
+        boolean allCellsRevealed = true;
+        boolean mineRevealed = false;
+
+        for (int i = 0; i < board.rows(); i++) {
+            for (int j = 0; j < board.columns(); j++) {
+                var cell = board.cells()[i][j];
+
+                if (cell.hasMine() && cell.isRevealed()) {
+                    mineRevealed = true;
+                }
+
+                if (!cell.hasMine() && !cell.isRevealed()) {
+                    allCellsRevealed = false;
+                }
+            }
+        }
+
+        if (mineRevealed) {
+            return GameStatus.Lose;
+        } else if (allCellsRevealed) {
+            return GameStatus.Win;
+        } else {
+            return GameStatus.Current;
+        }
     }
 
     public Game updateBoard(Board newBoard) {
