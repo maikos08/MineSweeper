@@ -35,16 +35,16 @@ public class BoardPresenter {
 
         if (cell.isFlagged()) {
             Cell updatedCell = cell.toggleFlag();
-            updateGameBoard(row, col, updatedCell);
+            updateGameBoard(row, col);
             return;
         }
 
         Cell updatedCell = cell.reveal();
-        updateGameBoard(row, col, updatedCell);
+        updateGameBoard(row, col);
     }
 
-    private void updateGameBoard(int row, int col, Cell updatedCell) {
-        Board updatedBoard = game.board().updateCell(row, col, updatedCell);
+    private void updateGameBoard(int row, int col) {
+        Board updatedBoard = game.board().updateCell(row, col);
         game = game.updateBoard(updatedBoard);
 
         display.show(updatedBoard);
@@ -54,8 +54,8 @@ public class BoardPresenter {
         return game;
     }
 
-    public void updateCell(int row, int col, Cell updatedCell) {
-        Board updatedBoard = game.board().updateCell(row, col, updatedCell);
+    public void updateCell(int row, int col) {
+        Board updatedBoard = game.board().updateCell(row, col);
 
         game = game.updateBoard(updatedBoard);
 
