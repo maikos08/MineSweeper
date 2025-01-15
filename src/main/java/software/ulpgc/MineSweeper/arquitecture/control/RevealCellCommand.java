@@ -18,6 +18,6 @@ public class RevealCellCommand {
         }
 
         Cell updatedCell = cell.reveal();
-        presenter.updateCell(row, col, updatedCell);
+        presenter.updateCell(row, col);
     }
 }
