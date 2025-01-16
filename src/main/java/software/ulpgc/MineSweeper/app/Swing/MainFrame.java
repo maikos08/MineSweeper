@@ -2,6 +2,7 @@ package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
 import software.ulpgc.MineSweeper.arquitecture.control.Command;
+import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
@@ -13,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 public class MainFrame extends JFrame {
     private final Map<String, Command> commands;
@@ -26,12 +30,11 @@ public class MainFrame extends JFrame {
     private GameTimer gameTimer;
 
     public MainFrame() {
-        commands = new HashMap<>();
-        setResizable(true);
+        Map<String, Command> commands = new HashMap<>();
+        setResizable(true);  // Permitir que se pueda cambiar el tamaño
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
-
     }
 
     private void adjustWindowSizeBasedOnDifficulty() {
@@ -59,10 +62,10 @@ public class MainFrame extends JFrame {
         setLayout(new BorderLayout());
         addStatusBar();
 
-
+        // Listener para mantener la ventana centrada cuando se cambia el tamaño
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
-                setLocationRelativeTo(null);
+                setLocationRelativeTo(null); // Centra la ventana después de cambiar el tamaño
             }
         });
     }
@@ -75,14 +78,8 @@ public class MainFrame extends JFrame {
         JLabel mineCounter = new JLabel("Mines: 10", SwingConstants.CENTER);
         mineCounter.setPreferredSize(new Dimension(100, 30));
 
-        Map<String, ImageIcon> icons = new HashMap<>();
-        try {
-            icons.put("facedefault", new ImageIcon("src/images/face_image.png"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        ImageIcon originalIcon = icons.get("facedefault");
+        Map<String, ImageIcon> images = new FileImageLoader("src/images").load();
+        ImageIcon originalIcon = images.get("face_image.png");
         Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon finalIcon = new ImageIcon(scaledImage);
 
@@ -97,7 +94,7 @@ public class MainFrame extends JFrame {
         statusBar.add(toolbar(), BorderLayout.NORTH);
         statusBar.add(mineCounter, BorderLayout.WEST);
         statusBar.add(resetButton, BorderLayout.CENTER);
-        statusBar.add(setupGameTimer(), BorderLayout.EAST);
+        statusBar.add(timerLabel, BorderLayout.EAST);
 
         add(statusBar, BorderLayout.NORTH);
     }
@@ -115,11 +112,12 @@ public class MainFrame extends JFrame {
         comboBox.addItem("Hard");
         comboBox.addItem("Personalized");
 
+        // Action listener para cambiar la dificultad seleccionada desde el ComboBox
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedDifficulty = (String) comboBox.getSelectedItem();
-                switch (selectedDifficulty) {
+                switch (requireNonNull(selectedDifficulty)) {
                     case "Easy":
                         setDifficulty(Difficulty.EASY);
                         break;
@@ -130,9 +128,9 @@ public class MainFrame extends JFrame {
                         setDifficulty(Difficulty.HARD);
                         break;
                     case "Personalized":
+                        // Maneja la opción personalizada aquí si es necesario
                         break;
                 }
-
                 initializeGame(difficulty);
             }
         });
@@ -149,6 +147,7 @@ public class MainFrame extends JFrame {
         if (boardPanel != null) {
             remove(boardPanel);
         }
+        removeBoardIfExists();
 
         if (gameTimer != null) {
             gameTimer.stop();
@@ -161,10 +160,11 @@ public class MainFrame extends JFrame {
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);
+
+        // Actualiza la interfaz para reflejar los cambios
         revalidate();
         repaint();
     }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

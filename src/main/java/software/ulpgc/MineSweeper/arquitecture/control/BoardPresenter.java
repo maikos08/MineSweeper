@@ -2,7 +2,6 @@ package software.ulpgc.MineSweeper.arquitecture.control;
 
 import java.awt.geom.Point2D;
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
-import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
@@ -110,12 +109,9 @@ public class BoardPresenter {
         }
 
         Board updatedBoard = game.board().updateCell(row, col);
-
         System.out.println("Updated board: ");
         System.out.println(updatedBoard);
-
         this.game = game.updateBoard(updatedBoard);
-
         display.show(game);
     }
 
@@ -123,17 +119,8 @@ public class BoardPresenter {
         return game;
     }
 
-    public void updateCell(int row, int col) {
-        Board updatedBoard = game.board().updateCell(row, col);
-
-        game = game.updateBoard(updatedBoard);
-
-        display.show(game);
-    }
-
     public void updateGame(Game newGame) {
         this.game = newGame;
-
         display.show(game);
     }
 }
