@@ -2,23 +2,22 @@ package software.ulpgc.MineSweeper.arquitecture.model;
 
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.function.Consumer;
 
 public class GameTimer {
     private final Timer timer;
-    private final long startTime;
+    private long startTime;
+    private final Consumer<Long> timeConsumer;
 
     public GameTimer(Consumer<Long> timeConsumer) {
+        this.timeConsumer = timeConsumer;
         this.startTime = System.currentTimeMillis();
+        this.timer = new Timer(1000, this::updateElapsedTime);
+    }
 
-        this.timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
-                timeConsumer.accept(elapsedTime);
-            }
-        });
+    private void updateElapsedTime(ActionEvent e) {
+        long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
+        timeConsumer.accept(elapsedTime);
     }
 
     public void start() {
@@ -27,5 +26,11 @@ public class GameTimer {
 
     public void stop() {
         timer.stop();
+    }
+
+    public void reset() {
+        stop();
+        startTime = System.currentTimeMillis();
+        start();
     }
 }

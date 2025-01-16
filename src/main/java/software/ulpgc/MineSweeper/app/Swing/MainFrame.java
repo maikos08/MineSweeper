@@ -24,7 +24,6 @@ public class MainFrame extends JFrame {
     private JPanel boardPanel;
     private SwingTimeDisplay timeDisplay;
     private GameTimer gameTimer;
-    private JLabel timerLabel;
 
     public MainFrame() {
         commands = new HashMap<>();
@@ -156,18 +155,15 @@ public class MainFrame extends JFrame {
         }
 
         Game newGame = new Game(difficulty);
-        gameTimer = new GameTimer(timeDisplay::updateTime);
+        gameTimer = new GameTimer(seconds -> timeDisplay.updateTime(seconds));
         SwingBoardDisplay boardDisplay = new SwingBoardDisplay(newGame);
         presenter = new BoardPresenter(boardDisplay, newGame, gameTimer);
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);
-        gameTimer.start();
         revalidate();
         repaint();
     }
-
-
 
 
     public static void main(String[] args) {
