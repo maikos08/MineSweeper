@@ -2,9 +2,7 @@ package software.ulpgc.MineSweeper.arquitecture.control;
 
 import java.awt.geom.Point2D;
 
-import javax.swing.SwingUtilities;
 
-import software.ulpgc.MineSweeper.app.Swing.MainFrame;
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;

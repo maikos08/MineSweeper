@@ -1,9 +1,5 @@
 package software.ulpgc.MineSweeper.arquitecture.view;
 
-import software.ulpgc.MineSweeper.app.Swing.SwingBoardDisplay;
-import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
-import software.ulpgc.MineSweeper.arquitecture.model.Board;
-import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 
 public interface BoardDisplay {

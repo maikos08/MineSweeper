@@ -1,5 +1,5 @@
 package software.ulpgc.MineSweeper.arquitecture.control;
 
-public interface Command {
-    void execute();
+public interface Command<T> {
+    void execute(T t);
 }

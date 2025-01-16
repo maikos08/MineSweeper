@@ -1,7 +1,6 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
-import software.ulpgc.MineSweeper.arquitecture.control.Command;
 import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
@@ -13,7 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -123,7 +121,7 @@ public class MainFrame extends JFrame {
                         setDifficulty(Difficulty.HARD);
                         break;
                     case "Personalized":
-                        // Handle custom difficulty option if necessary
+                        // TODO: Implement personalized difficulty
                         break;
                 }
                 initializeGame(difficulty);
@@ -171,13 +169,6 @@ public class MainFrame extends JFrame {
         SwingUtilities.invokeLater(() -> {
             int totalMines = FlagCounter.getInstance().getRemainingFlags();
             mineAndFlagCounter.setText("Mines: " + totalMines);
-        });
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainFrame mainFrame = new MainFrame();
-            mainFrame.setVisible(true);
         });
     }
 
