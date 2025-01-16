@@ -19,7 +19,6 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 
 public class MainFrame extends JFrame {
-    private final Map<String, Command> commands;
     private static int WINDOW_WIDTH = 800;
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
@@ -31,7 +30,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         Map<String, Command> commands = new HashMap<>();
-        setResizable(true);  // Permitir que se pueda cambiar el tamaño
+        setResizable(false);  // Permitir que se pueda cambiar el tamaño
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
@@ -94,7 +93,7 @@ public class MainFrame extends JFrame {
         statusBar.add(toolbar(), BorderLayout.NORTH);
         statusBar.add(mineCounter, BorderLayout.WEST);
         statusBar.add(resetButton, BorderLayout.CENTER);
-        statusBar.add(timerLabel, BorderLayout.EAST);
+        statusBar.add(setupGameTimer(), BorderLayout.EAST);
 
         add(statusBar, BorderLayout.NORTH);
     }
@@ -147,7 +146,6 @@ public class MainFrame extends JFrame {
         if (boardPanel != null) {
             remove(boardPanel);
         }
-        removeBoardIfExists();
 
         if (gameTimer != null) {
             gameTimer.stop();
