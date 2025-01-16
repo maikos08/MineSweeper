@@ -34,11 +34,11 @@ public class MainFrame extends JFrame {
         switch (this.difficulty) {
             case EASY -> {
                 WINDOW_WIDTH = 400;
-                WINDOW_HEIGHT = 500;
+                WINDOW_HEIGHT = 510;
             }
             case MEDIUM -> {
                 WINDOW_WIDTH = 750;
-                WINDOW_HEIGHT = 750;
+                WINDOW_HEIGHT = 830;
             }
             case HARD -> {
                 WINDOW_WIDTH = 1150;
