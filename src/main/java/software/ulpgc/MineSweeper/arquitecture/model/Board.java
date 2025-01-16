@@ -111,8 +111,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
             flagCounter.removeFlag();
         }
 
-        System.out.println("Remaining flags: " + flagCounter.getRemainingFlags());
-
         return new Board(rows, columns, mineCount, updatedCells, observers);
     }
 

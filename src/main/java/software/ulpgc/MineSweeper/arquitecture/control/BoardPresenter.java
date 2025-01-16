@@ -33,7 +33,6 @@ public class BoardPresenter {
             return;
         }
 
-        System.out.println("Clicked on " + point);
 
         int row = (int) point.getY();
         int col = (int) point.getX();
@@ -69,7 +68,6 @@ public class BoardPresenter {
             return;
         }
 
-        System.out.println("Right-clicked on " + point);
 
         int row = (int) point.getY();
         int col = (int) point.getX();
@@ -87,8 +85,6 @@ public class BoardPresenter {
         Board updatedBoard = game.board().setFlag(row, col);
         this.game = game.updateBoard(updatedBoard);
 
-        System.out.println("Updated board: ");
-        System.out.println(updatedBoard);
 
         display.show(game);
     }
@@ -100,8 +96,6 @@ public class BoardPresenter {
         }
 
         Board updatedBoard = game.board().updateCell(row, col);
-        System.out.println("Updated board: ");
-        System.out.println(updatedBoard);
         this.game = game.updateBoard(updatedBoard);
         display.show(game);
     }
