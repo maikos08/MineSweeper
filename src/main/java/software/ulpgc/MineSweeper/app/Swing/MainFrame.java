@@ -32,7 +32,7 @@ public class MainFrame extends JFrame {
     private GameTimer gameTimer;
 
     public MainFrame() {
-        Map<String, Command> commands = new HashMap<>();
+        this.commands = new HashMap<>();
         setResizable(false);  // Permitir que se pueda cambiar el tamaño
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
@@ -159,18 +159,18 @@ public class MainFrame extends JFrame {
         // Crea y agrega el nuevo tablero
         Game game = new Game(difficulty);
         SwingBoardDisplay boardDisplay = new SwingBoardDisplay(game);
-        presenter = new BoardPresenter(boardDisplay, game);
 
         GameStatusChecker gameStatusChecker = new GameStatusChecker(presenter);
         game.board().addObserver(gameStatusChecker);
 
         Game newGame = new Game(difficulty);
         gameTimer = new GameTimer(seconds -> timeDisplay.updateTime(seconds));
-        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(newGame);
         presenter = new BoardPresenter(boardDisplay, newGame, gameTimer);
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);
+
+        presenter = new BoardPresenter(boardDisplay, game, gameTimer);
 
         // Actualiza la interfaz para reflejar los cambios
         revalidate();
