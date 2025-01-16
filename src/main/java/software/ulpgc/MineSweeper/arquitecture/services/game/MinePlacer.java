@@ -35,7 +35,7 @@ public class MinePlacer {
             int x = random.nextInt(rows);
             int y = random.nextInt(columns);
 
-            if (!cells[x][y].hasMine() && (x != avoidRow || y != avoidCol)) {
+            if (!cells[x][y].hasMine() && (x < avoidRow - 1 || x > avoidRow + 1 || y < avoidCol - 1 || y > avoidCol + 1)) {
                 cells[x][y] = new Cell(true, false, false, 0);
                 placedMines++;
             }
