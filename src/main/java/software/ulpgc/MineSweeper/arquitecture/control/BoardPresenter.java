@@ -1,27 +1,25 @@
 package software.ulpgc.MineSweeper.arquitecture.control;
 
 import java.awt.geom.Point2D;
-
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
+import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
 
 public class BoardPresenter {
     private final BoardDisplay display;
     private Game game;
     private boolean firstClick = true;
+    private GameTimer gameTimer;
 
-    public BoardPresenter(BoardDisplay display, Game game) {
+    public BoardPresenter(BoardDisplay display, Game game, GameTimer gameTimer) {
         this.display = display;
         this.game = game;
+        this.gameTimer = gameTimer;
         initializeDisplay();
     }
 
-    public void initializeNewGame() {
-        game = new Game(game.difficulty());
-        display.show(game);
-    }
 
     private void initializeDisplay() {
         display.on("cell-click", this::handleCellClick);
@@ -46,22 +44,33 @@ public class BoardPresenter {
             updateGameBoard(row, col, firstClick);
         }
 
-        firstClick = false;
 
-        switch (game.checkStatus()) {
-            case GameStatus.Win -> display.showWin();
-            case GameStatus.Lose -> display.showLose();
-            case GameStatus.Current -> display.show(game);
+        if (firstClick) {
+            gameTimer.reset();
+            gameTimer.start();
+            firstClick = false;
         }
 
+        switch (game.checkStatus()) {
+            case GameStatus.Win -> {
+                display.showWin();
+                gameTimer.stop();
+            }
+            case GameStatus.Lose -> {
+                display.showLose();
+                gameTimer.stop();
+            }
+            case GameStatus.Current -> display.show(game);
+        }
     }
+
 
     private void handleCellClickRigth(Point2D point) {
         if (game.checkStatus() != GameStatus.Current) {
             return;
         }
-        
-        System.out.println("Clicked on " + point);
+
+        System.out.println("Right-clicked on " + point);
 
         int row = (int) point.getY();
         int col = (int) point.getX();
@@ -75,7 +84,10 @@ public class BoardPresenter {
 
         switch (game.checkStatus()) {
             case GameStatus.Win -> display.showWin();
-            case GameStatus.Lose -> display.showLose();
+            case GameStatus.Lose -> {
+                display.showLose();
+                gameTimer.stop(); // Stop the timer when the game is lost
+            }
             case GameStatus.Current -> display.show(game);
         }
     }
@@ -112,5 +124,4 @@ public class BoardPresenter {
         this.game = newGame;
         display.show(game);
     }
-
 }

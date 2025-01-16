@@ -5,6 +5,7 @@ import software.ulpgc.MineSweeper.arquitecture.control.Command;
 import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
+import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
 import javax.swing.*;
@@ -15,18 +16,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+
 import static java.util.Objects.requireNonNull;
 
 public class MainFrame extends JFrame {
     private static int WINDOW_WIDTH = 800;
     private static int WINDOW_HEIGHT = 800;
+    private BoardPresenter presenter;
     private SelectDifficultyDialog selectDifficultyDialog;
     private Difficulty difficulty = Difficulty.EASY;
-    private JPanel boardPanel; // El panel donde se mostrará el tablero
+    private JPanel boardPanel;
+    private SwingTimeDisplay timeDisplay;
+    private GameTimer gameTimer;
 
     public MainFrame() {
         Map<String, Command> commands = new HashMap<>();
-        setResizable(true);  // Permitir que se pueda cambiar el tamaño
+        setResizable(false);  // Permitir que se pueda cambiar el tamaño
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
@@ -53,7 +58,7 @@ public class MainFrame extends JFrame {
         setTitle("Minesweeper");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        setLocationRelativeTo(null); // Centra la ventana al inicio
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         addStatusBar();
 
@@ -82,17 +87,14 @@ public class MainFrame extends JFrame {
         resetButton.setFocusPainted(false);
         resetButton.setPreferredSize(new Dimension(50, 50));
         resetButton.addActionListener(e -> {
-            // Reinicia el juego con la nueva dificultad seleccionada
             initializeGame(difficulty);
         });
 
-        JLabel timerLabel = new JLabel("Time: 0", SwingConstants.CENTER);
-        timerLabel.setPreferredSize(new Dimension(100, 30));
 
         statusBar.add(toolbar(), BorderLayout.NORTH);
         statusBar.add(mineCounter, BorderLayout.WEST);
         statusBar.add(resetButton, BorderLayout.CENTER);
-        statusBar.add(timerLabel, BorderLayout.EAST);
+        statusBar.add(setupGameTimer(), BorderLayout.EAST);
 
         add(statusBar, BorderLayout.NORTH);
     }
@@ -136,25 +138,31 @@ public class MainFrame extends JFrame {
         return comboBox;
     }
 
-    private void initializeGame(Difficulty difficulty) {
-        removeBoardIfExists();
-
-        Game game = new Game(difficulty);
-        SwingBoardDisplay display = new SwingBoardDisplay(game);
-        BoardPresenter presenter = new BoardPresenter(display, game);
-
-        boardPanel = new JPanel(new BorderLayout());
-        boardPanel.add(display, BorderLayout.CENTER);
-        add(boardPanel, BorderLayout.CENTER);
-
-        revalidate();
-        repaint();
+    private Component setupGameTimer() {
+        timeDisplay = SwingTimeDisplay.createWithTimer();
+        return timeDisplay;
     }
 
-    private void removeBoardIfExists() {
+    private void initializeGame(Difficulty difficulty) {
         if (boardPanel != null) {
             remove(boardPanel);
         }
+
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
+
+        Game newGame = new Game(difficulty);
+        gameTimer = new GameTimer(seconds -> timeDisplay.updateTime(seconds));
+        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(newGame);
+        presenter = new BoardPresenter(boardDisplay, newGame, gameTimer);
+        boardPanel = new JPanel(new BorderLayout());
+        boardPanel.add(boardDisplay, BorderLayout.CENTER);
+        add(boardPanel, BorderLayout.CENTER);
+
+        // Actualiza la interfaz para reflejar los cambios
+        revalidate();
+        repaint();
     }
 
     public static void main(String[] args) {
