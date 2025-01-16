@@ -1,6 +1,10 @@
 package software.ulpgc.MineSweeper.arquitecture.control;
 
 import java.awt.geom.Point2D;
+
+import javax.swing.SwingUtilities;
+
+import software.ulpgc.MineSweeper.app.Swing.MainFrame;
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
@@ -19,7 +23,6 @@ public class BoardPresenter {
         this.gameTimer = gameTimer;
         initializeDisplay();
     }
-
 
     private void initializeDisplay() {
         display.on("cell-click", this::handleCellClick);
@@ -44,7 +47,6 @@ public class BoardPresenter {
             updateGameBoard(row, col, firstClick);
         }
 
-
         if (firstClick) {
             gameTimer.reset();
             gameTimer.start();
@@ -63,7 +65,6 @@ public class BoardPresenter {
             case GameStatus.Current -> display.show(game);
         }
     }
-
 
     private void handleCellClickRigth(Point2D point) {
         if (game.checkStatus() != GameStatus.Current) {
@@ -86,18 +87,18 @@ public class BoardPresenter {
 
     private void setFlag(int row, int col) {
         Board updatedBoard = game.board().setFlag(row, col);
+        this.game = game.updateBoard(updatedBoard);
 
         System.out.println("Updated board: ");
         System.out.println(updatedBoard);
-
-        this.game = game.updateBoard(updatedBoard);
 
         display.show(game);
     }
 
     private void updateGameBoard(int row, int col, boolean firstClick) {
         if (firstClick) {
-            game = game.updateBoard(new Board(game.board().rows(), game.board().columns(), game.board().mineCount(), row, col, game.board().observers()));
+            game = game.updateBoard(new Board(game.board().rows(), game.board().columns(), game.board().mineCount(),
+                    row, col, game.board().observers()));
         }
 
         Board updatedBoard = game.board().updateCell(row, col);
@@ -111,7 +112,7 @@ public class BoardPresenter {
         return game;
     }
 
-    public void updateGameStatusChecker(GameStatus gameStatus){
+    public void updateGameStatusChecker(GameStatus gameStatus) {
         game = new Game(game.board(), game.difficulty(), gameStatus);
     }
 
@@ -119,4 +120,5 @@ public class BoardPresenter {
         this.game = newGame;
         display.show(game);
     }
+
 }

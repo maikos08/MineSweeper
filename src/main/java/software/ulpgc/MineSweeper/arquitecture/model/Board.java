@@ -1,6 +1,7 @@
 package software.ulpgc.MineSweeper.arquitecture.model;
 
 import software.ulpgc.MineSweeper.arquitecture.control.Observer;
+import software.ulpgc.MineSweeper.arquitecture.services.FlagCounter;
 import software.ulpgc.MineSweeper.arquitecture.services.game.MineCounter;
 import software.ulpgc.MineSweeper.arquitecture.services.game.MinePlacer;
 
@@ -15,7 +16,8 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
     public Board(int rows, int columns, int mineCount, List<Observer> observers) {
         this(rows, columns, mineCount, initializeCells(rows, columns, mineCount), observers);
 
-        System.out.println(this);
+        FlagCounter flagCounter = FlagCounter.getInstance();
+        flagCounter.setMines(mineCount);
     }
 
     public Board(int rows, int columns, int mineCount, int avoidRow, int avoidCol, List<Observer> observers) {
@@ -55,8 +57,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
         return new Board(rows, columns, mineCount, updatedCells, observers);
     }
 
- 
-
     private void revealCells(int row, int col, Cell[][] updatedCells, boolean[][] visited) {
         if (row < 0 || row >= rows || col < 0 || col >= columns || visited[row][col]) {
             return;
@@ -82,7 +82,7 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
     }
 
     private void notifyObservers(Cell cell) {
-        for (Observer observer: observers) {
+        for (Observer observer : observers) {
             observer.notify(cell);
         }
     }
@@ -102,6 +102,16 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
                 .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
                 .toArray(Cell[][]::new);
         updatedCells[row][col] = updatedCell;
+
+        FlagCounter flagCounter = FlagCounter.getInstance();
+
+        if (!cell.isFlagged()) {
+            flagCounter.addFlag();
+        } else {
+            flagCounter.removeFlag();
+        }
+
+        System.out.println("Remaining flags: " + flagCounter.getRemainingFlags());
 
         return new Board(rows, columns, mineCount, updatedCells, observers);
     }
