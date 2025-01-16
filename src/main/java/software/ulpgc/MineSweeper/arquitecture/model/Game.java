@@ -1,5 +1,9 @@
 package software.ulpgc.MineSweeper.arquitecture.model;
 
+import software.ulpgc.MineSweeper.arquitecture.services.observers.GameStatusChecker;
+
+import java.util.ArrayList;
+
 public record Game(Board board, Difficulty difficulty, GameStatus gameStatus) {
 
     public Game(Difficulty difficulty) {
@@ -7,7 +11,7 @@ public record Game(Board board, Difficulty difficulty, GameStatus gameStatus) {
                 new Board(
                         difficulty.getRows(),
                         difficulty.getColumns(),
-                        difficulty.getMineCount()),
+                        difficulty.getMineCount(), new ArrayList<>()),
                 difficulty,
                 GameStatus.Current);
     }
@@ -46,6 +50,4 @@ public record Game(Board board, Difficulty difficulty, GameStatus gameStatus) {
     public Game revealMines() {
         return new Game(board.revealMines(), difficulty, gameStatus);
     }
-
-
 }

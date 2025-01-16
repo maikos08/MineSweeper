@@ -12,7 +12,6 @@ public class SelectDifficultyCommand {
 
     public void execute(Difficulty difficulty) {
         Game newGame = new Game(difficulty);
-
         presenter.updateGame(newGame);
     }
 }

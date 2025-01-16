@@ -4,6 +4,7 @@ import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
 import software.ulpgc.MineSweeper.arquitecture.control.Command;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
+import software.ulpgc.MineSweeper.arquitecture.services.observers.GameStatusChecker;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
 import javax.swing.*;
@@ -28,6 +29,7 @@ public class MainFrame extends JFrame {
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
+        addStatusBar();
     }
 
     private void adjustWindowSizeBasedOnDifficulty() {
@@ -53,7 +55,6 @@ public class MainFrame extends JFrame {
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(null); // Centra la ventana al inicio
         setLayout(new BorderLayout());
-        addStatusBar();
 
         // Listener para mantener la ventana centrada cuando se cambia el tamaño
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -68,7 +69,7 @@ public class MainFrame extends JFrame {
         statusBar.setLayout(new BorderLayout());
         statusBar.setBackground(Color.LIGHT_GRAY);
 
-        JLabel mineCounter = new JLabel("Mines: 10", SwingConstants.CENTER);
+        JLabel mineCounter = new JLabel("Mines: " + presenter.getGame().board().mineCount(), SwingConstants.CENTER);
         mineCounter.setPreferredSize(new Dimension(100, 30));
 
         Map<String, ImageIcon> icons = new HashMap<>();
@@ -152,6 +153,9 @@ public class MainFrame extends JFrame {
         Game game = new Game(difficulty);
         SwingBoardDisplay boardDisplay = new SwingBoardDisplay(game);
         presenter = new BoardPresenter(boardDisplay, game);
+
+        GameStatusChecker gameStatusChecker = new GameStatusChecker(presenter);
+        game.board().addObserver(gameStatusChecker);
 
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);

@@ -3,8 +3,10 @@ package software.ulpgc.MineSweeper.arquitecture.control;
 import java.awt.geom.Point2D;
 
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
+import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
+import software.ulpgc.MineSweeper.arquitecture.services.observers.GameStatusChecker;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
 
 public class BoardPresenter {
@@ -44,13 +46,6 @@ public class BoardPresenter {
         if (row < rows && col < columns) {
             updateGameBoard(row, col);
         }
-
-        switch (game.checkStatus()) {
-            case GameStatus.Win -> display.showWin();
-            case GameStatus.Lose -> display.showLose();
-            case GameStatus.Current -> display.show(game);
-        }
-
     }
 
     private void handleCellClickRigth(Point2D point) {
@@ -68,12 +63,6 @@ public class BoardPresenter {
 
         if (row < rows && col < columns) {
             setFlag(row, col);
-        }
-
-        switch (game.checkStatus()) {
-            case GameStatus.Win -> display.showWin();
-            case GameStatus.Lose -> display.showLose();
-            case GameStatus.Current -> display.show(game);
         }
     }
 
@@ -105,16 +94,21 @@ public class BoardPresenter {
 
     public void updateCell(int row, int col) {
         Board updatedBoard = game.board().updateCell(row, col);
-
         game = game.updateBoard(updatedBoard);
-
         display.show(game);
     }
 
     public void updateGame(Game newGame) {
         this.game = newGame;
-
         display.show(game);
     }
 
+    public void updateGameStatusChecker(GameStatus gameStatus){
+
+        switch (gameStatus) {
+            case GameStatus.Win -> display.showWin();
+            case GameStatus.Lose -> display.showLose();
+            case GameStatus.Current -> display.show(game);
+        }
+    }
 }

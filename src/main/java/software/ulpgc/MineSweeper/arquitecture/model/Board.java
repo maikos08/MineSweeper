@@ -1,17 +1,20 @@
 package software.ulpgc.MineSweeper.arquitecture.model;
 
+import software.ulpgc.MineSweeper.arquitecture.control.Observer;
 import software.ulpgc.MineSweeper.arquitecture.services.game.MineCounter;
 import software.ulpgc.MineSweeper.arquitecture.services.game.MinePlacer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
+public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<Observer> observers) {
 
     private static final MinePlacer minePlacer = new MinePlacer();
     private static final MineCounter mineCounter = new MineCounter();
 
-    public Board(int rows, int columns, int mineCount) {
-        this(rows, columns, mineCount, initializeCells(rows, columns, mineCount));
+    public Board(int rows, int columns, int mineCount, List<Observer> observers) {
+        this(rows, columns, mineCount, initializeCells(rows, columns, mineCount), observers);
     }
 
     private static Cell[][] initializeCells(int rows, int columns, int mineCount) {
@@ -31,9 +34,11 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
                 .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
                 .toArray(Cell[][]::new);
 
-        revealCells(row, col, updatedCells, visited);
 
-        return new Board(rows, columns, mineCount, updatedCells);
+        revealCells(row, col, updatedCells, visited);
+        notifyObservers(updatedCells[row][col]);
+
+        return new Board(rows, columns, mineCount, updatedCells, observers);
     }
 
     private void revealCells(int row, int col, Cell[][] updatedCells, boolean[][] visited) {
@@ -71,7 +76,7 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
                 .toArray(Cell[][]::new);
         updatedCells[row][col] = updatedCell;
 
-        return new Board(rows, columns, mineCount, updatedCells);
+        return new Board(rows, columns, mineCount, updatedCells, observers);
     }
 
     public int adjacentMines(int row, int col) {
@@ -107,6 +112,17 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
                     cells[i][j] = new Cell(cells[i][j].hasMine(), false, true, cells[i][j].adjacentMines());
             }
         }
-        return new Board(rows, columns, mineCount, cells);
+
+        return new Board(rows, columns, mineCount, cells, observers);
+    }
+
+    public void addObserver(Observer observer){
+        observers.add(observer);
+    }
+
+    private void notifyObservers(Cell cell){
+        for (Observer observer : observers){
+            observer.notify(cell);
+        }
     }
 }
