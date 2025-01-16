@@ -5,6 +5,7 @@ import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
 import javax.swing.*;
 import java.awt.*;
 
+
 public class SwingTimeDisplay extends JPanel {
     private final JLabel timerLabel = new JLabel("Time: 0");
     private GameTimer gameTimer;

@@ -4,6 +4,7 @@ import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
 
+
 public class GameTimer {
     private final Timer timer;
     private long startTime;

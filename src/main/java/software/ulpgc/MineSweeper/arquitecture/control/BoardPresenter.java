@@ -20,6 +20,7 @@ public class BoardPresenter {
         initializeDisplay();
     }
 
+
     private void initializeDisplay() {
         display.on("cell-click", this::handleCellClick);
         display.on("cell-right-click", this::handleCellClickRigth);
