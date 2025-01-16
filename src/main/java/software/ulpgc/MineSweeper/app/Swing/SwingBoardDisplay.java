@@ -1,10 +1,8 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
-import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
-import software.ulpgc.MineSweeper.arquitecture.model.Image;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
 
 import javax.swing.*;
@@ -12,7 +10,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,13 +17,12 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
     private Game game;
     private final Map<String, ImageIcon> images;
     private final Map<String, Clicked> eventListeners = new HashMap<>();
-    private final FileImageLoader loader = new FileImageLoader("src/images/");
-
     private int row;
     private int col;
 
     public SwingBoardDisplay(Game game) {
         this.game = game;
+        FileImageLoader loader = new FileImageLoader("src/images/");
         this.images = loader.load();
         setDoubleBuffered(true);
         addMouseListener(createMouseListener());
@@ -55,10 +51,6 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
                 drawCell(g, cell, square);
             }
         }
-    }
-
-    public Map<String, ImageIcon> getImages() {
-        return images;
     }
 
     private void drawCell(Graphics g, Cell cell, Square square) {
