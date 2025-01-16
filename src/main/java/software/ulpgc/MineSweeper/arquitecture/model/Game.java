@@ -47,6 +47,7 @@ public record Game(Board board, Difficulty difficulty, GameStatus gameStatus) {
         return new Game(newBoard, difficulty, gameStatus);
     }
 
+
     public Game revealMines() {
         return new Game(board.revealMines(), difficulty, gameStatus);
     }

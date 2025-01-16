@@ -2,9 +2,11 @@ package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
 import software.ulpgc.MineSweeper.arquitecture.control.Command;
+import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.services.observers.GameStatusChecker;
+import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
 import javax.swing.*;
@@ -13,6 +15,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+
+import static java.util.Objects.requireNonNull;
 
 public class MainFrame extends JFrame {
     private final Map<String, Command> commands;
@@ -21,26 +27,27 @@ public class MainFrame extends JFrame {
     private BoardPresenter presenter;
     private SelectDifficultyDialog selectDifficultyDialog;
     private Difficulty difficulty = Difficulty.EASY;
-    private JPanel boardPanel; // El panel donde se mostrará el tablero
+    private JPanel boardPanel;
+    private SwingTimeDisplay timeDisplay;
+    private GameTimer gameTimer;
 
     public MainFrame() {
-        commands = new HashMap<>();
-        setResizable(true);  // Permitir que se pueda cambiar el tamaño
+        Map<String, Command> commands = new HashMap<>();
+        setResizable(false);  // Permitir que se pueda cambiar el tamaño
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
-        addStatusBar();
     }
 
     private void adjustWindowSizeBasedOnDifficulty() {
         switch (this.difficulty) {
             case EASY -> {
                 WINDOW_WIDTH = 400;
-                WINDOW_HEIGHT = 500;
+                WINDOW_HEIGHT = 510;
             }
             case MEDIUM -> {
                 WINDOW_WIDTH = 750;
-                WINDOW_HEIGHT = 750;
+                WINDOW_HEIGHT = 830;
             }
             case HARD -> {
                 WINDOW_WIDTH = 1150;
@@ -53,8 +60,9 @@ public class MainFrame extends JFrame {
         setTitle("Minesweeper");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        setLocationRelativeTo(null); // Centra la ventana al inicio
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        addStatusBar();
 
         // Listener para mantener la ventana centrada cuando se cambia el tamaño
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -69,17 +77,11 @@ public class MainFrame extends JFrame {
         statusBar.setLayout(new BorderLayout());
         statusBar.setBackground(Color.LIGHT_GRAY);
 
-        JLabel mineCounter = new JLabel("Mines: " + presenter.getGame().board().mineCount(), SwingConstants.CENTER);
+        JLabel mineCounter = new JLabel("Mines: 10", SwingConstants.CENTER);
         mineCounter.setPreferredSize(new Dimension(100, 30));
 
-        Map<String, ImageIcon> icons = new HashMap<>();
-        try {
-            icons.put("facedefault", new ImageIcon("src/images/face_image.png"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        ImageIcon originalIcon = icons.get("facedefault");
+        Map<String, ImageIcon> images = new FileImageLoader("src/images").load();
+        ImageIcon originalIcon = images.get("face_image.png");
         Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon finalIcon = new ImageIcon(scaledImage);
 
@@ -97,7 +99,7 @@ public class MainFrame extends JFrame {
         statusBar.add(toolbar(), BorderLayout.NORTH);
         statusBar.add(mineCounter, BorderLayout.WEST);
         statusBar.add(resetButton, BorderLayout.CENTER);
-        statusBar.add(timerLabel, BorderLayout.EAST);
+        statusBar.add(setupGameTimer(), BorderLayout.EAST);
 
         add(statusBar, BorderLayout.NORTH);
     }
@@ -143,6 +145,11 @@ public class MainFrame extends JFrame {
         return comboBox;
     }
 
+    private Component setupGameTimer() {
+        timeDisplay = SwingTimeDisplay.createWithTimer();
+        return timeDisplay;
+    }
+
     private void initializeGame(Difficulty difficulty) {
         // Elimina el tablero anterior si existe
         if (boardPanel != null) {
@@ -157,6 +164,10 @@ public class MainFrame extends JFrame {
         GameStatusChecker gameStatusChecker = new GameStatusChecker(presenter);
         game.board().addObserver(gameStatusChecker);
 
+        Game newGame = new Game(difficulty);
+        gameTimer = new GameTimer(seconds -> timeDisplay.updateTime(seconds));
+        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(newGame);
+        presenter = new BoardPresenter(boardDisplay, newGame, gameTimer);
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);

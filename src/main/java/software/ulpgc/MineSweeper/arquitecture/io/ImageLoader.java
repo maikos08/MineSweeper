@@ -1,8 +1,8 @@
 package software.ulpgc.MineSweeper.arquitecture.io;
 
-import software.ulpgc.MineSweeper.arquitecture.model.Image;
+import javax.swing.*;
 import java.util.Map;
 
 public interface ImageLoader {
-    Map<String, Image> load();
+    Map<String, ImageIcon> load();
 }

@@ -2,6 +2,7 @@ package software.ulpgc.MineSweeper.arquitecture.io;
 
 import software.ulpgc.MineSweeper.arquitecture.model.Image;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public class FileImageLoader implements ImageLoader {
     private static final String DEFAULT_PATH = "images";
-    private final Map<String, Image> images;
+    private final Map<String, ImageIcon> images;
     private final File folder;
     private final FileImageDeserializer deserializer;
 
@@ -26,7 +27,7 @@ public class FileImageLoader implements ImageLoader {
     }
 
     @Override
-    public Map<String, Image> load() {
+    public Map<String, ImageIcon> load() {
         loadImages(folder);
         return images;
     }
@@ -60,7 +61,7 @@ public class FileImageLoader implements ImageLoader {
                     return null;
                 }
             };
-            images.put(file.getName(), image);
+            images.put(file.getName(), deserializer.deserialize(image.content()));
         } catch (IOException e) {
             System.err.println("Error loading image: " + file.getName());
         }
