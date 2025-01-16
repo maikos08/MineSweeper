@@ -1,16 +1,14 @@
 package software.ulpgc.MineSweeper.arquitecture.io;
 
-import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import javax.swing.*;
 
-public class FileImageDeserializer implements ImageDeserializer{
+public class FileImageDeserializer implements ImageDeserializer {
     @Override
-    public Object deserialize(byte[] bytes) {
+    public ImageIcon deserialize(byte[] bytes) {
         try {
-            return ImageIO.read(new ByteArrayInputStream(bytes));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return new ImageIcon(bytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deserializing image bytes", e);
         }
     }
 }

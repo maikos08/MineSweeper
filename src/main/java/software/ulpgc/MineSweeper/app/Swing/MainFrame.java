@@ -1,30 +1,33 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
-import software.ulpgc.MineSweeper.arquitecture.control.Command;
+import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
-import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
+import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
+import software.ulpgc.MineSweeper.arquitecture.services.FlagCounter;
+import software.ulpgc.MineSweeper.arquitecture.services.observers.GameStatusObserver;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 public class MainFrame extends JFrame {
-    private final Map<String, Command> commands;
     private static int WINDOW_WIDTH = 800;
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
-    private SelectDifficultyDialog selectDifficultyDialog;
     private Difficulty difficulty = Difficulty.EASY;
-    private JPanel boardPanel; // El panel donde se mostrará el tablero
+    private JPanel boardPanel;
+    private SwingTimeDisplay timeDisplay;
+    private GameTimer gameTimer;
+    private JLabel mineAndFlagCounter;
 
     public MainFrame() {
-        commands = new HashMap<>();
-        setResizable(true);  // Permitir que se pueda cambiar el tamaño
+        setResizable(false);
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
@@ -34,11 +37,11 @@ public class MainFrame extends JFrame {
         switch (this.difficulty) {
             case EASY -> {
                 WINDOW_WIDTH = 400;
-                WINDOW_HEIGHT = 500;
+                WINDOW_HEIGHT = 510;
             }
             case MEDIUM -> {
                 WINDOW_WIDTH = 750;
-                WINDOW_HEIGHT = 750;
+                WINDOW_HEIGHT = 830;
             }
             case HARD -> {
                 WINDOW_WIDTH = 1150;
@@ -51,14 +54,13 @@ public class MainFrame extends JFrame {
         setTitle("Minesweeper");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        setLocationRelativeTo(null); // Centra la ventana al inicio
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         addStatusBar();
 
-        // Listener para mantener la ventana centrada cuando se cambia el tamaño
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
-                setLocationRelativeTo(null); // Centra la ventana después de cambiar el tamaño
+                setLocationRelativeTo(null);
             }
         });
     }
@@ -68,35 +70,25 @@ public class MainFrame extends JFrame {
         statusBar.setLayout(new BorderLayout());
         statusBar.setBackground(Color.LIGHT_GRAY);
 
-        JLabel mineCounter = new JLabel("Mines: 10", SwingConstants.CENTER);
-        mineCounter.setPreferredSize(new Dimension(100, 30));
+        mineAndFlagCounter = new JLabel("Mines: 10 | Flags: 0", SwingConstants.CENTER);
+        mineAndFlagCounter.setPreferredSize(new Dimension(100, 30));
 
-        Map<String, ImageIcon> icons = new HashMap<>();
-        try {
-            icons.put("facedefault", new ImageIcon("src/images/face_image.png"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        FlagCounter.getInstance().addListener(this::updateMineAndFlagCounter);
 
-        ImageIcon originalIcon = icons.get("facedefault");
+        Map<String, ImageIcon> images = new FileImageLoader("src/images").load();
+        ImageIcon originalIcon = images.get("face_image.png");
         Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon finalIcon = new ImageIcon(scaledImage);
 
         JButton resetButton = new JButton(finalIcon);
         resetButton.setFocusPainted(false);
         resetButton.setPreferredSize(new Dimension(50, 50));
-        resetButton.addActionListener(e -> {
-            // Reinicia el juego con la nueva dificultad seleccionada
-            initializeGame(difficulty);
-        });
-
-        JLabel timerLabel = new JLabel("Time: 0", SwingConstants.CENTER);
-        timerLabel.setPreferredSize(new Dimension(100, 30));
+        resetButton.addActionListener(e -> initializeGame(difficulty));
 
         statusBar.add(toolbar(), BorderLayout.NORTH);
-        statusBar.add(mineCounter, BorderLayout.WEST);
+        statusBar.add(mineAndFlagCounter, BorderLayout.WEST);
         statusBar.add(resetButton, BorderLayout.CENTER);
-        statusBar.add(timerLabel, BorderLayout.EAST);
+        statusBar.add(setupGameTimer(), BorderLayout.EAST);
 
         add(statusBar, BorderLayout.NORTH);
     }
@@ -114,12 +106,11 @@ public class MainFrame extends JFrame {
         comboBox.addItem("Hard");
         comboBox.addItem("Personalized");
 
-        // Action listener para cambiar la dificultad seleccionada desde el ComboBox
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedDifficulty = (String) comboBox.getSelectedItem();
-                switch (selectedDifficulty) {
+                switch (requireNonNull(selectedDifficulty)) {
                     case "Easy":
                         setDifficulty(Difficulty.EASY);
                         break;
@@ -130,11 +121,9 @@ public class MainFrame extends JFrame {
                         setDifficulty(Difficulty.HARD);
                         break;
                     case "Personalized":
-                        // Maneja la opción personalizada aquí si es necesario
+                        // TODO: Implement personalized difficulty
                         break;
                 }
-
-                // Reinicia el juego con la nueva dificultad
                 initializeGame(difficulty);
             }
         });
@@ -142,26 +131,46 @@ public class MainFrame extends JFrame {
         return comboBox;
     }
 
+    private Component setupGameTimer() {
+        timeDisplay = SwingTimeDisplay.createWithTimer();
+        return timeDisplay;
+    }
+
     private void initializeGame(Difficulty difficulty) {
-        // Elimina el tablero anterior si existe
-        if (boardPanel != null) {
-            remove(boardPanel); // Eliminar el tablero anterior
+        if (gameTimer != null) {
+            gameTimer.reset();
         }
 
-        // Crea y agrega el nuevo tablero
-        Game game = new Game(difficulty);
-        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(game);
-        presenter = new BoardPresenter(boardDisplay, game);
+        if (boardPanel != null) {
+            remove(boardPanel);
+        }
 
+        Game newGame = new Game(difficulty);
+
+        gameTimer = new GameTimer(seconds -> timeDisplay.updateTime(seconds));
+        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(newGame);
+        presenter = new BoardPresenter(boardDisplay, newGame, gameTimer);
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);
 
-        // Actualiza la interfaz para reflejar los cambios
+        FlagCounter.getInstance().setMines(difficulty.getMineCount());
+
+        updateMineAndFlagCounter();
+
+        GameStatusObserver gameStatusObserver = new GameStatusObserver(presenter);
+        newGame.board().addObserver(gameStatusObserver);
+
         revalidate();
         repaint();
     }
 
+    private void updateMineAndFlagCounter() {
+        SwingUtilities.invokeLater(() -> {
+            int totalMines = FlagCounter.getInstance().getRemainingFlags();
+            mineAndFlagCounter.setText("Mines: " + totalMines);
+        });
+    }
 
     public Difficulty getDifficulty() {
         return difficulty;
@@ -171,9 +180,5 @@ public class MainFrame extends JFrame {
         this.difficulty = difficulty;
         adjustWindowSizeBasedOnDifficulty();
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    }
-
-    public SelectDifficultyDialog getSelectDifficultyDialog() {
-        return selectDifficultyDialog;
     }
 }
