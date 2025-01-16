@@ -104,6 +104,7 @@ public class BoardPresenter {
     }
 
     public void updateGameStatusChecker(GameStatus gameStatus){
+        game = new Game(game.board(), game.difficulty(), gameStatus);
 
         switch (gameStatus) {
             case GameStatus.Win -> display.showWin();

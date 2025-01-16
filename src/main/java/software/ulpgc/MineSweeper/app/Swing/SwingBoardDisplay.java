@@ -142,7 +142,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
 
     @Override
     public void showLose() {
-        game = game.revealMines();
+        this.game = game.revealMines();
     }
 
     @Override

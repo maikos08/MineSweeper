@@ -36,7 +36,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
 
 
         revealCells(row, col, updatedCells, visited);
-        notifyObservers(updatedCells[row][col]);
 
         return new Board(rows, columns, mineCount, updatedCells, observers);
     }
@@ -54,6 +53,7 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
         visited[row][col] = true;
 
         updatedCells[row][col] = cell.reveal();
+        notifyObservers(updatedCells[row][col]);
 
         if (cell.adjacentMines() == 0) {
             for (int i = row - 1; i <= row + 1; i++) {

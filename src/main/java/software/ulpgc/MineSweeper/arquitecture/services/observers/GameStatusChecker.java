@@ -9,7 +9,7 @@ import software.ulpgc.MineSweeper.arquitecture.control.Observer;
 
 public class GameStatusChecker implements Observer {
     private final BoardPresenter boardPresenter;
-    private final int revealedCells = 0;
+    private int revealedCells = 0;
 
     public GameStatusChecker(BoardPresenter boardPresenter) {
         this.boardPresenter = boardPresenter;
@@ -23,7 +23,7 @@ public class GameStatusChecker implements Observer {
     private void checkStatus(Cell cell) {
         if (isLoseCondition(cell)){
             boardPresenter.updateGameStatusChecker(GameStatus.Lose);
-        } else if (isWinCondition(cell)){
+        } else if (isWinCondition()){
             boardPresenter.updateGameStatusChecker(GameStatus.Win);
         }
     }
@@ -32,7 +32,10 @@ public class GameStatusChecker implements Observer {
         return cell.hasMine();
     }
 
-    public boolean isWinCondition(Cell cell){
-        return true;
+    public boolean isWinCondition(){
+        revealedCells++;
+        int totalCells = boardPresenter.getGame().board().columns() * boardPresenter.getGame().board().rows();
+        int minesCount = boardPresenter.getGame().board().mineCount();
+        return totalCells == revealedCells + minesCount;
     }
 }
