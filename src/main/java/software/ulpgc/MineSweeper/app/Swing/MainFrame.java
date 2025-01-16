@@ -2,8 +2,10 @@ package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
 import software.ulpgc.MineSweeper.arquitecture.control.Command;
+import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
+import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
 import javax.swing.*;
@@ -18,6 +20,8 @@ public class MainFrame extends JFrame {
     private static int WINDOW_WIDTH = 800;
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
+    private Game game;
+    private SwingBoardDisplay display;
     private SelectDifficultyDialog selectDifficultyDialog;
     private Difficulty difficulty = Difficulty.EASY;
     private JPanel boardPanel; // El panel donde se mostrará el tablero
@@ -71,14 +75,8 @@ public class MainFrame extends JFrame {
         JLabel mineCounter = new JLabel("Mines: 10", SwingConstants.CENTER);
         mineCounter.setPreferredSize(new Dimension(100, 30));
 
-        Map<String, ImageIcon> icons = new HashMap<>();
-        try {
-            icons.put("facedefault", new ImageIcon("src/images/face_image.png"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        ImageIcon originalIcon = icons.get("facedefault");
+        Map<String, ImageIcon> images = new FileImageLoader("src/images").load();
+        ImageIcon originalIcon = images.get("face_image.png");
         Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon finalIcon = new ImageIcon(scaledImage);
 
@@ -149,12 +147,12 @@ public class MainFrame extends JFrame {
         }
 
         // Crea y agrega el nuevo tablero
-        Game game = new Game(difficulty);
-        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(game);
-        presenter = new BoardPresenter(boardDisplay, game);
+        game = new Game(difficulty);
+        display = new SwingBoardDisplay(game);
+        presenter = new BoardPresenter(display, game);
 
         boardPanel = new JPanel(new BorderLayout());
-        boardPanel.add(boardDisplay, BorderLayout.CENTER);
+        boardPanel.add(display, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);
 
         // Actualiza la interfaz para reflejar los cambios
