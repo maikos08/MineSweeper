@@ -82,14 +82,6 @@ public class BoardPresenter {
             setFlag(row, col);
         }
 
-        switch (game.checkStatus()) {
-            case GameStatus.Win -> display.showWin();
-            case GameStatus.Lose -> {
-                display.showLose();
-                gameTimer.stop(); // Stop the timer when the game is lost
-            }
-            case GameStatus.Current -> display.show(game);
-        }
     }
 
     private void setFlag(int row, int col) {
@@ -106,7 +98,7 @@ public class BoardPresenter {
     private void updateGameBoard(int row, int col, boolean firstClick) {
         if (firstClick && game.board().cells()[row][col].hasMine()) {
             System.out.println("First click on mine, moving mine...");
-            game = game.updateBoard(new Board(game.board().rows(), game.board().columns(), game.board().mineCount(), row, col));
+            game = game.updateBoard(new Board(game.board().rows(), game.board().columns(), game.board().mineCount(), row, col, game.board().observers()));
         }
 
         Board updatedBoard = game.board().updateCell(row, col);
@@ -118,6 +110,10 @@ public class BoardPresenter {
 
     public Game getGame() {
         return game;
+    }
+
+    public void updateGameStatusChecker(GameStatus gameStatus){
+        game = new Game(game.board(), game.difficulty(), gameStatus);
     }
 
     public void updateGame(Game newGame) {

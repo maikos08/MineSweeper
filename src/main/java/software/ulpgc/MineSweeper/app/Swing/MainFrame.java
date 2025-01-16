@@ -6,6 +6,7 @@ import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
+import software.ulpgc.MineSweeper.arquitecture.services.observers.GameStatusObserver;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
 import javax.swing.*;
@@ -159,6 +160,9 @@ public class MainFrame extends JFrame {
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);
+
+        GameStatusObserver gameStatusObserver = new GameStatusObserver(presenter);
+        newGame.board().addObserver(gameStatusObserver);
 
         // Actualiza la interfaz para reflejar los cambios
         revalidate();
