@@ -38,13 +38,13 @@ public class GameTimer {
     }
 
     public void reset() {
+        stop();
         timeConsumer.accept(0L);
         startTime = System.currentTimeMillis();
 
         if (running) {
             timer.restart();
         }
-
     }
 
     @Override
