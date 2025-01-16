@@ -12,6 +12,12 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
 
     public Board(int rows, int columns, int mineCount) {
         this(rows, columns, mineCount, initializeCells(rows, columns, mineCount));
+
+        System.out.println(this);
+    }
+
+    public Board(int rows, int columns, int mineCount, int avoidRow, int avoidCol) {
+        this(rows, columns, mineCount, initializeCells(rows, columns, mineCount, avoidRow, avoidCol));
     }
 
     private static Cell[][] initializeCells(int rows, int columns, int mineCount) {
@@ -25,6 +31,17 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         return mineCounter.countAdjacentMines(cellsWithMines);
     }
 
+    public static Cell[][] initializeCells(int rows, int columns, int mineCount, int avoidRow, int avoidCol) {
+        Cell[][] cells = new Cell[rows][columns];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                cells[i][j] = new Cell(false, false, false, 0);
+            }
+        }
+        Cell[][] cellsWithMines = minePlacer.placeMines(cells, mineCount, avoidRow, avoidCol);
+        return mineCounter.countAdjacentMines(cellsWithMines);
+    }
+
     public Board updateCell(int row, int col) {
         boolean[][] visited = new boolean[rows][columns];
         Cell[][] updatedCells = Arrays.stream(cells)
@@ -35,6 +52,8 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
 
         return new Board(rows, columns, mineCount, updatedCells);
     }
+
+ 
 
     private void revealCells(int row, int col, Cell[][] updatedCells, boolean[][] visited) {
         if (row < 0 || row >= rows || col < 0 || col >= columns || visited[row][col]) {
@@ -93,7 +112,7 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         StringBuilder sb = new StringBuilder();
         for (Cell[] row : cells) {
             for (Cell cell : row) {
-                sb.append(cell.isRevealed() ? (cell.hasMine() ? "X" : cell.adjacentMines()) : ".");
+                sb.append(cell.hasMine() ? "X" : cell.adjacentMines());
             }
             sb.append("\n");
         }
@@ -109,4 +128,5 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells) {
         }
         return new Board(rows, columns, mineCount, cells);
     }
+
 }

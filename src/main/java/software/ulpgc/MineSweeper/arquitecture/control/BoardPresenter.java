@@ -3,6 +3,7 @@ package software.ulpgc.MineSweeper.arquitecture.control;
 import java.awt.geom.Point2D;
 
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
+import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
 import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
@@ -10,6 +11,7 @@ import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
 public class BoardPresenter {
     private final BoardDisplay display;
     private Game game;
+    private boolean firstClick = true;
 
     public BoardPresenter(BoardDisplay display, Game game) {
         this.display = display;
@@ -42,8 +44,10 @@ public class BoardPresenter {
         int columns = game.board().columns();
 
         if (row < rows && col < columns) {
-            updateGameBoard(row, col);
+            updateGameBoard(row, col, firstClick);
         }
+
+        firstClick = false;
 
         switch (game.checkStatus()) {
             case GameStatus.Win -> display.showWin();
@@ -88,7 +92,14 @@ public class BoardPresenter {
         display.show(game);
     }
 
-    private void updateGameBoard(int row, int col) {
+    private void updateGameBoard(int row, int col, boolean firstClick) {
+        if (firstClick && game.board().cells()[row][col].hasMine()) {
+            System.out.println("First click on mine, moving mine...");
+            game = game.updateBoard(new Board(game.board().rows(), game.board().columns(), game.board().mineCount(), row, col));
+        }
+
+
+
         Board updatedBoard = game.board().updateCell(row, col);
 
         System.out.println("Updated board: ");
