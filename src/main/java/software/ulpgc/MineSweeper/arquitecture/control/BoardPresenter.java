@@ -96,8 +96,7 @@ public class BoardPresenter {
     }
 
     private void updateGameBoard(int row, int col, boolean firstClick) {
-        if (firstClick && game.board().cells()[row][col].hasMine()) {
-            System.out.println("First click on mine, moving mine...");
+        if (firstClick) {
             game = game.updateBoard(new Board(game.board().rows(), game.board().columns(), game.board().mineCount(), row, col, game.board().observers()));
         }
 

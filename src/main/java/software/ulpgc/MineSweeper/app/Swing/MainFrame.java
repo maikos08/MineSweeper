@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-
 import static java.util.Objects.requireNonNull;
 
 public class MainFrame extends JFrame {
@@ -32,7 +31,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         Map<String, Command> commands = new HashMap<>();
-        setResizable(false);  // Permitir que se pueda cambiar el tamaño
+        setResizable(false); // Permitir que se pueda cambiar el tamaño
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
@@ -63,10 +62,9 @@ public class MainFrame extends JFrame {
         setLayout(new BorderLayout());
         addStatusBar();
 
-        // Listener para mantener la ventana centrada cuando se cambia el tamaño
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
-                setLocationRelativeTo(null); // Centra la ventana después de cambiar el tamaño
+                setLocationRelativeTo(null);
             }
         });
     }
@@ -88,9 +86,11 @@ public class MainFrame extends JFrame {
         resetButton.setFocusPainted(false);
         resetButton.setPreferredSize(new Dimension(50, 50));
         resetButton.addActionListener(e -> {
+
+            System.out.println(gameTimer);
+
             initializeGame(difficulty);
         });
-
 
         statusBar.add(toolbar(), BorderLayout.NORTH);
         statusBar.add(mineCounter, BorderLayout.WEST);
@@ -145,6 +145,10 @@ public class MainFrame extends JFrame {
     }
 
     private void initializeGame(Difficulty difficulty) {
+        if (gameTimer != null) {
+            gameTimer.reset();
+        }
+
         if (boardPanel != null) {
             remove(boardPanel);
         }
