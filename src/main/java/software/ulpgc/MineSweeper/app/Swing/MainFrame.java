@@ -4,6 +4,7 @@ import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
 import software.ulpgc.MineSweeper.arquitecture.control.Command;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
+import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
 import javax.swing.*;
@@ -20,14 +21,18 @@ public class MainFrame extends JFrame {
     private BoardPresenter presenter;
     private SelectDifficultyDialog selectDifficultyDialog;
     private Difficulty difficulty = Difficulty.EASY;
-    private JPanel boardPanel; // El panel donde se mostrará el tablero
+    private JPanel boardPanel;
+    private SwingTimeDisplay timeDisplay;
+    private GameTimer gameTimer;
+    private JLabel timerLabel;
 
     public MainFrame() {
         commands = new HashMap<>();
-        setResizable(true);  // Permitir que se pueda cambiar el tamaño
+        setResizable(true);
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
         initializeGame(difficulty);
+
     }
 
     private void adjustWindowSizeBasedOnDifficulty() {
@@ -51,14 +56,14 @@ public class MainFrame extends JFrame {
         setTitle("Minesweeper");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        setLocationRelativeTo(null); // Centra la ventana al inicio
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         addStatusBar();
 
-        // Listener para mantener la ventana centrada cuando se cambia el tamaño
+
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
-                setLocationRelativeTo(null); // Centra la ventana después de cambiar el tamaño
+                setLocationRelativeTo(null);
             }
         });
     }
@@ -86,17 +91,14 @@ public class MainFrame extends JFrame {
         resetButton.setFocusPainted(false);
         resetButton.setPreferredSize(new Dimension(50, 50));
         resetButton.addActionListener(e -> {
-            // Reinicia el juego con la nueva dificultad seleccionada
             initializeGame(difficulty);
         });
 
-        JLabel timerLabel = new JLabel("Time: 0", SwingConstants.CENTER);
-        timerLabel.setPreferredSize(new Dimension(100, 30));
 
         statusBar.add(toolbar(), BorderLayout.NORTH);
         statusBar.add(mineCounter, BorderLayout.WEST);
         statusBar.add(resetButton, BorderLayout.CENTER);
-        statusBar.add(timerLabel, BorderLayout.EAST);
+        statusBar.add(setupGameTimer(), BorderLayout.EAST);
 
         add(statusBar, BorderLayout.NORTH);
     }
@@ -114,7 +116,6 @@ public class MainFrame extends JFrame {
         comboBox.addItem("Hard");
         comboBox.addItem("Personalized");
 
-        // Action listener para cambiar la dificultad seleccionada desde el ComboBox
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -130,11 +131,9 @@ public class MainFrame extends JFrame {
                         setDifficulty(Difficulty.HARD);
                         break;
                     case "Personalized":
-                        // Maneja la opción personalizada aquí si es necesario
                         break;
                 }
 
-                // Reinicia el juego con la nueva dificultad
                 initializeGame(difficulty);
             }
         });
@@ -142,25 +141,34 @@ public class MainFrame extends JFrame {
         return comboBox;
     }
 
+    private Component setupGameTimer() {
+        timeDisplay = SwingTimeDisplay.createWithTimer();
+        return timeDisplay;
+    }
+
     private void initializeGame(Difficulty difficulty) {
-        // Elimina el tablero anterior si existe
         if (boardPanel != null) {
-            remove(boardPanel); // Eliminar el tablero anterior
+            remove(boardPanel);
         }
 
-        // Crea y agrega el nuevo tablero
-        Game game = new Game(difficulty);
-        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(game);
-        presenter = new BoardPresenter(boardDisplay, game);
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
 
+        Game newGame = new Game(difficulty);
+        gameTimer = new GameTimer(timeDisplay::updateTime);
+        SwingBoardDisplay boardDisplay = new SwingBoardDisplay(newGame);
+        presenter = new BoardPresenter(boardDisplay, newGame, gameTimer);
         boardPanel = new JPanel(new BorderLayout());
         boardPanel.add(boardDisplay, BorderLayout.CENTER);
         add(boardPanel, BorderLayout.CENTER);
-
-        // Actualiza la interfaz para reflejar los cambios
+        gameTimer.start();
         revalidate();
         repaint();
     }
+
+
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
