@@ -37,7 +37,6 @@ public class MainFrame extends JFrame {
     private JLabel mineAndFlagCounter;
 
     public MainFrame() {
-        this.commands = new HashMap<>();
         setResizable(false);
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
@@ -146,7 +145,7 @@ public class MainFrame extends JFrame {
             }
         });
 
-        return swingDifficultyDialog;
+        return comboBox;
     }
 
     private void setPersonalizedTable() {
@@ -255,10 +254,6 @@ public class MainFrame extends JFrame {
         this.difficulty = difficulty;
         adjustWindowSizeBasedOnDifficulty();
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    }
-
-    public void put(String name, Command<Difficulty> command){
-        commands.put(name, command);
     }
 
     public BoardPresenter getPresenter() {
