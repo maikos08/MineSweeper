@@ -32,7 +32,7 @@ mine-sweeper/
 
 ## **Patrones Arquitectónicos**
 
-### **Modelo-Vista-Controlador (MVC)**
+### **Modelo-Vista-Controlador (MVP)**
 La arquitectura general del proyecto sigue este enfoque, separando las responsabilidades en tres capas:
 
 1. **Modelo**:
@@ -43,7 +43,7 @@ La arquitectura general del proyecto sigue este enfoque, separando las responsab
     - Gestiona la presentación visual. Proporciona componentes para mostrar el tablero, la selección de dificultades y otros elementos de la UI.
     - Ejemplo: `SwingBoardDisplay`, `SwingDifficultyDialog`.
 
-3. **Controlador**:
+3. **Presenter**:
     - Media entre el modelo y la vista, actuando como coordinador. Gestiona eventos de usuario, actualiza el modelo y notifica a la vista.
     - Ejemplo: `BoardPresenter`, `SelectDifficultyCommand`.
 
