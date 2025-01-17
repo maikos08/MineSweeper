@@ -45,19 +45,19 @@ public class BoardPresenter {
         }
 
         if (firstClick) {
-            gameTimer.reset();
-            gameTimer.start();
+            gameTimer.resetTimer();
+            gameTimer.startTimer();
             firstClick = false;
         }
 
         switch (game.checkStatus()) {
             case GameStatus.Win -> {
                 display.showWin();
-                gameTimer.stop();
+                gameTimer.stopTimer();
             }
             case GameStatus.Lose -> {
                 display.showLose();
-                gameTimer.stop();
+                gameTimer.stopTimer();
             }
             case GameStatus.Current -> display.show(game);
         }

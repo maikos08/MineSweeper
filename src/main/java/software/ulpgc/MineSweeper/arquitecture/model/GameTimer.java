@@ -13,16 +13,20 @@ public class GameTimer {
     public GameTimer(Consumer<Long> timeConsumer) {
         this.timeConsumer = timeConsumer;
         this.startTime = System.currentTimeMillis();
-        this.timer = new Timer(1000, this::updateElapsedTime);
+        this.timer = new Timer(1000, this::updateElapsedSeconds);
         this.running = false;
     }
 
-    private void updateElapsedTime(ActionEvent e) {
-        long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
-        timeConsumer.accept(elapsedTime);
+    private void updateElapsedSeconds(ActionEvent event) {
+        long elapsedSeconds = calculateElapsedSeconds();
+        timeConsumer.accept(elapsedSeconds);
     }
 
-    public void start() {
+    private long calculateElapsedSeconds() {
+        return (System.currentTimeMillis() - startTime) / 1000;
+    }
+
+    public void startTimer() {
         if (!running) {
             startTime = System.currentTimeMillis();
             timer.start();
@@ -30,18 +34,17 @@ public class GameTimer {
         }
     }
 
-    public void stop() {
+    public void stopTimer() {
         if (running) {
             timer.stop();
             running = false;
         }
     }
 
-    public void reset() {
-        stop();
+    public void resetTimer() {
+        stopTimer();
         timeConsumer.accept(0L);
         startTime = System.currentTimeMillis();
-
         if (running) {
             timer.restart();
         }
@@ -54,5 +57,4 @@ public class GameTimer {
                 ", running=" + running +
                 '}';
     }
-
 }
