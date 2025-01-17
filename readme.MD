@@ -32,7 +32,7 @@ mine-sweeper/
 
 ## **Patrones Arquitectónicos**
 
-### **Modelo-Vista-Controlador (MVP)**
+### **Modelo-Vista-Presenter (MVP)**
 La arquitectura general del proyecto sigue este enfoque, separando las responsabilidades en tres capas:
 
 1. **Modelo**:
