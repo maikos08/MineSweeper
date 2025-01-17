@@ -36,16 +36,20 @@ public class MainFrame extends JFrame {
     private void adjustWindowSizeBasedOnDifficulty() {
         switch (this.difficulty) {
             case EASY -> {
-                WINDOW_WIDTH = 400;
-                WINDOW_HEIGHT = 510;
+                WINDOW_WIDTH = 288;
+                WINDOW_HEIGHT = 375;
             }
             case MEDIUM -> {
-                WINDOW_WIDTH = 750;
-                WINDOW_HEIGHT = 830;
+                WINDOW_WIDTH = 576;
+                WINDOW_HEIGHT = 690;
             }
             case HARD -> {
                 WINDOW_WIDTH = 1150;
-                WINDOW_HEIGHT = 700;
+                WINDOW_HEIGHT = 1000;
+            }
+            case PERSONALIZED -> {
+                WINDOW_WIDTH = difficulty.getColumns()*36;
+                WINDOW_HEIGHT = difficulty.getRows()*40+50;
             }
         }
     }
@@ -121,7 +125,7 @@ public class MainFrame extends JFrame {
                         setDifficulty(Difficulty.HARD);
                         break;
                     case "Personalized":
-                        // TODO: Implement personalized difficulty
+                        setPersonalizedDifficulty();
                         break;
                 }
                 initializeGame(difficulty);
@@ -129,6 +133,64 @@ public class MainFrame extends JFrame {
         });
 
         return comboBox;
+    }
+
+    private void setPersonalizedDifficulty() {
+
+        JPanel setPersonalizedPanel1 = new JPanel(new GridLayout(3,2,5,5));
+
+        JLabel labelRows = new JLabel("Filas:");
+        JTextField fieldRows = new JTextField();
+        JLabel labelColumns = new JLabel("Columnas:");
+        JTextField fieldColumns = new JTextField();
+        JLabel labelMines = new JLabel("Minas:");
+        JTextField fieldMines = new JTextField();
+
+        // Añadir componentes al panel
+        setPersonalizedPanel1.add(labelRows);
+        setPersonalizedPanel1.add(fieldRows);
+        setPersonalizedPanel1.add(labelColumns);
+        setPersonalizedPanel1.add(fieldColumns);
+        setPersonalizedPanel1.add(labelMines);
+        setPersonalizedPanel1.add(fieldMines);
+        JPanel setPersonalizedPanel = setPersonalizedPanel1;
+
+        int result = JOptionPane.showConfirmDialog(null, setPersonalizedPanel, "Configurar Dificultad Personalizada",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    // Recoger valores ingresados
+                    int rows = Integer.parseInt(fieldRows.getText());
+                    int columns = Integer.parseInt(fieldColumns.getText());
+                    int mines = Integer.parseInt(fieldMines.getText());
+
+                    // Validar los valores (ejemplo)
+                    if (rows < 8 || rows > 24 || columns < 8 || columns > 32) {
+                        throw new IllegalArgumentException("Filas y columnas deben estar entre 1 y 50.");
+                    }
+                    if (mines < 1 || mines >= (rows * columns)*0.3) {
+                        throw new IllegalArgumentException("El número de minas debe ser mayor que 0 y menor que el total de celdas.");
+                    }
+
+                    Difficulty.PERSONALIZED.setRows(rows);
+                    Difficulty.PERSONALIZED.setColumns(columns);
+                    Difficulty.PERSONALIZED.setMineCount(mines);
+
+                    setDifficulty(Difficulty.PERSONALIZED);
+
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Por favor, introduce números válidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+
+
+
+
+
     }
 
     private Component setupGameTimer() {

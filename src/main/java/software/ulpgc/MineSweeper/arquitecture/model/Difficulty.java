@@ -4,11 +4,12 @@ public enum Difficulty {
 
     EASY(8, 8, 10),
     MEDIUM(16, 16, 40),
-    HARD(16, 31, 99);
+    HARD(24, 31, 99),
+    PERSONALIZED(8,8,10);
 
-    private final int rows;
-    private final int columns;
-    private final int mineCount;
+    private int rows;
+    private int columns;
+    private int mineCount;
 
     Difficulty(int rows, int columns, int mineCount) {
         this.rows = rows;
@@ -26,5 +27,30 @@ public enum Difficulty {
 
     public int getMineCount() {
         return mineCount;
+    }
+
+
+    public void setRows(int rows) {
+        if (this == PERSONALIZED) {
+            this.rows = rows;
+        } else {
+            throw new UnsupportedOperationException("No se pueden modificar los valores de dificultades predefinidas.");
+        }
+    }
+
+    public void setColumns(int columns) {
+        if (this == PERSONALIZED) {
+            this.columns = columns;
+        } else {
+            throw new UnsupportedOperationException("No se pueden modificar los valores de dificultades predefinidas.");
+        }
+    }
+
+    public void setMineCount(int mineCount) {
+        if (this == PERSONALIZED) {
+            this.mineCount = mineCount;
+        } else {
+            throw new UnsupportedOperationException("No se pueden modificar los valores de dificultades predefinidas.");
+        }
     }
 }
