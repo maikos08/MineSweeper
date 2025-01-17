@@ -1,4 +1,4 @@
-package software.ulpgc.MineSweeper.arquitecture.services;
+package software.ulpgc.MineSweeper.arquitecture.services.game;
 
 import java.util.ArrayList;
 import java.util.List;
