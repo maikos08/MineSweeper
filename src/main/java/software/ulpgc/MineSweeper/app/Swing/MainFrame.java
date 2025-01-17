@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class MainFrame extends JFrame {
     private static int WINDOW_WIDTH = 800;
     private static int WINDOW_HEIGHT = 800;
@@ -144,7 +145,7 @@ public class MainFrame extends JFrame {
 
     private void initializeGame(Difficulty difficulty) {
         if (gameTimer != null) {
-            gameTimer.reset();
+            gameTimer.resetTimer();
         }
 
         if (boardPanel != null) {

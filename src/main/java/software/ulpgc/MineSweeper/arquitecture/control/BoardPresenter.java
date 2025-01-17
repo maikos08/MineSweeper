@@ -92,8 +92,8 @@ public class BoardPresenter {
 
     private void startTimer() {
         if (firstClick) {
-            gameTimer.reset();
-            gameTimer.start();
+            gameTimer.resetTimer();
+            gameTimer.startTimer();
             firstClick = false;
         }
     }
@@ -118,11 +118,11 @@ public class BoardPresenter {
         switch (game.checkStatus()) {
             case GameStatus.Win -> {
                 display.showWin();
-                gameTimer.stop();
+                gameTimer.stopTimer();
             }
             case GameStatus.Lose -> {
                 display.showLose();
-                gameTimer.stop();
+                gameTimer.stopTimer();
             }
             case GameStatus.Current -> display.show(game);
         }
