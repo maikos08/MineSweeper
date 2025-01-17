@@ -3,6 +3,8 @@ package software.ulpgc.MineSweeper.app.Swing;
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
 import software.ulpgc.MineSweeper.arquitecture.control.Command;
 import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
+import software.ulpgc.MineSweeper.arquitecture.model.BaseDifficulty;
+import software.ulpgc.MineSweeper.arquitecture.model.CustomDifficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
@@ -27,8 +29,8 @@ public class MainFrame extends JFrame {
     private static int WINDOW_WIDTH = 800;
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
-    private Difficulty difficulty = Difficulty.EASY;
-    private final Map<String, Command<Difficulty>> commands;
+    private Difficulty difficulty = BaseDifficulty.EASY;
+
     private JPanel boardPanel;
     private SwingTimeDisplay timeDisplay;
     private GameTimer gameTimer;
@@ -43,20 +45,27 @@ public class MainFrame extends JFrame {
     }
 
     private void adjustWindowSizeBasedOnDifficulty() {
-        switch (this.difficulty) {
-            case EASY -> {
+        switch (difficulty) {
+            case BaseDifficulty.EASY -> {
                 WINDOW_WIDTH = 400;
                 WINDOW_HEIGHT = 510;
             }
-            case MEDIUM -> {
+            case BaseDifficulty.MEDIUM -> {
                 WINDOW_WIDTH = 750;
                 WINDOW_HEIGHT = 830;
             }
-            case HARD -> {
+            case BaseDifficulty.HARD -> {
                 WINDOW_WIDTH = 1150;
                 WINDOW_HEIGHT = 700;
             }
+
+            default -> createCustomWindow(difficulty);
         }
+    }
+
+    private void createCustomWindow(Difficulty difficulty) {
+        WINDOW_WIDTH = difficulty.getColumns() * 36;
+        WINDOW_HEIGHT = difficulty.getRows() * 40 + 50;
     }
 
     private void setupMainFrame() {
@@ -109,26 +118,92 @@ public class MainFrame extends JFrame {
     }
 
     private Component selector() {
-        List<Difficulty> difficulties = new ArrayList<>();
-        difficulties.add(Difficulty.EASY);
-        difficulties.add(Difficulty.MEDIUM);
-        difficulties.add(Difficulty.HARD);
-        difficulties.add(Difficulty.PERSONALIZED);
+        JComboBox<String> comboBox = new JComboBox<>();
+        comboBox.addItem("Easy");
+        comboBox.addItem("Medium");
+        comboBox.addItem("Hard");
+        comboBox.addItem("Custom");
 
-        SwingDifficultyDialog swingDifficultyDialog = new SwingDifficultyDialog(difficulties);
-        swingDifficultyDialog.getSelector().addItemListener(new ItemListener() {
+        comboBox.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() != ItemEvent.SELECTED) return;
-                Difficulty selectedDifficulty = (Difficulty) swingDifficultyDialog.getSelector().getSelectedItem();
-                commands.get("select difficulty").execute(selectedDifficulty);
-                difficulty = selectedDifficulty;
-                adjustWindowSizeBasedOnDifficulty();
-                setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+            public void actionPerformed(ActionEvent e) {
+                String selectedDifficulty = (String) comboBox.getSelectedItem();
+                switch (requireNonNull(selectedDifficulty)) {
+                    case "Easy":
+                        setDifficulty(BaseDifficulty.EASY);
+                        break;
+                    case "Medium":
+                        setDifficulty(BaseDifficulty.MEDIUM);
+                        break;
+                    case "Hard":
+                        setDifficulty(BaseDifficulty.HARD);
+                        break;
+                    case "Custom":
+                        setPersonalizedTable();
+                        break;
+                }
+                initializeGame(difficulty);
             }
         });
 
         return swingDifficultyDialog;
+    }
+
+    private void setPersonalizedTable() {
+        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 10));
+
+        JTextField fieldWidth = createPanelRow("Width:", panel);
+        JTextField fieldHeight = createPanelRow("Height:", panel);
+        JTextField fieldMines = createPanelRow("Total mines:", panel);
+
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                panel,
+                "Configure personalized table",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int width = Integer.parseInt(fieldWidth.getText());
+                int height = Integer.parseInt(fieldHeight.getText());
+                int mines = Integer.parseInt(fieldMines.getText());
+
+                if (!areValidParameters(width, height, mines)) {
+                    showErrorMessage("Please enter valid values." +
+                            "\nThe number of mines must be positive and less than the third of the total number of cells."
+                            +
+                            "\nWidth must be between 8-32." +
+                            "\nHeight must be between 8-24.");
+                } else {
+                    CustomDifficulty personalizedDifficulty = new CustomDifficulty(width, height, mines);
+                    setDifficulty(personalizedDifficulty);
+                }
+            } catch (NumberFormatException e) {
+                showErrorMessage("Please enter valid values.");
+            }
+        }
+    }
+
+    private static boolean areValidParameters(int width, int height, int mines) {
+        return (8 <= width && width <= 32) &&
+                (8 <= height && height <= 24) &&
+                (mines > 0 && mines <= (width * height) / 3);
+    }
+
+    private static void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(null,
+                message,
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    private static JTextField createPanelRow(String text, JPanel panel) {
+        JLabel labelName = new JLabel(text);
+        JTextField fieldName = new JTextField();
+        panel.add(labelName);
+        panel.add(fieldName);
+        return fieldName;
     }
 
     private Component setupGameTimer() {
