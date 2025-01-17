@@ -1,7 +1,10 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
+import software.ulpgc.MineSweeper.arquitecture.control.Command;
 import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
+import software.ulpgc.MineSweeper.arquitecture.model.BaseDifficulty;
+import software.ulpgc.MineSweeper.arquitecture.model.CustomDifficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
@@ -12,6 +15,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -20,7 +29,8 @@ public class MainFrame extends JFrame {
     private static int WINDOW_WIDTH = 800;
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
-    private Difficulty difficulty = Difficulty.EASY;
+    private Difficulty difficulty = BaseDifficulty.EASY;
+
     private JPanel boardPanel;
     private SwingTimeDisplay timeDisplay;
     private GameTimer gameTimer;
@@ -34,24 +44,27 @@ public class MainFrame extends JFrame {
     }
 
     private void adjustWindowSizeBasedOnDifficulty() {
-        switch (this.difficulty) {
-            case EASY -> {
-                WINDOW_WIDTH = 288;
-                WINDOW_HEIGHT = 375;
+        switch (difficulty) {
+            case BaseDifficulty.EASY -> {
+                WINDOW_WIDTH = 400;
+                WINDOW_HEIGHT = 510;
             }
-            case MEDIUM -> {
-                WINDOW_WIDTH = 576;
-                WINDOW_HEIGHT = 690;
+            case BaseDifficulty.MEDIUM -> {
+                WINDOW_WIDTH = 750;
+                WINDOW_HEIGHT = 830;
             }
-            case HARD -> {
+            case BaseDifficulty.HARD -> {
                 WINDOW_WIDTH = 1150;
-                WINDOW_HEIGHT = 1000;
+                WINDOW_HEIGHT = 700;
             }
-            case PERSONALIZED -> {
-                WINDOW_WIDTH = difficulty.getColumns()*36;
-                WINDOW_HEIGHT = difficulty.getRows()*40+50;
-            }
+
+            default -> createCustomWindow(difficulty);
         }
+    }
+
+    private void createCustomWindow(Difficulty difficulty) {
+        WINDOW_WIDTH = difficulty.getColumns() * 36;
+        WINDOW_HEIGHT = difficulty.getRows() * 40 + 50;
     }
 
     private void setupMainFrame() {
@@ -108,7 +121,7 @@ public class MainFrame extends JFrame {
         comboBox.addItem("Easy");
         comboBox.addItem("Medium");
         comboBox.addItem("Hard");
-        comboBox.addItem("Personalized");
+        comboBox.addItem("Custom");
 
         comboBox.addActionListener(new ActionListener() {
             @Override
@@ -116,16 +129,16 @@ public class MainFrame extends JFrame {
                 String selectedDifficulty = (String) comboBox.getSelectedItem();
                 switch (requireNonNull(selectedDifficulty)) {
                     case "Easy":
-                        setDifficulty(Difficulty.EASY);
+                        setDifficulty(BaseDifficulty.EASY);
                         break;
                     case "Medium":
-                        setDifficulty(Difficulty.MEDIUM);
+                        setDifficulty(BaseDifficulty.MEDIUM);
                         break;
                     case "Hard":
-                        setDifficulty(Difficulty.HARD);
+                        setDifficulty(BaseDifficulty.HARD);
                         break;
-                    case "Personalized":
-                        setPersonalizedDifficulty();
+                    case "Custom":
+                        setPersonalizedTable();
                         break;
                 }
                 initializeGame(difficulty);
@@ -135,62 +148,61 @@ public class MainFrame extends JFrame {
         return comboBox;
     }
 
-    private void setPersonalizedDifficulty() {
+    private void setPersonalizedTable() {
+        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 10));
 
-        JPanel setPersonalizedPanel1 = new JPanel(new GridLayout(3,2,5,5));
+        JTextField fieldWidth = createPanelRow("Width:", panel);
+        JTextField fieldHeight = createPanelRow("Height:", panel);
+        JTextField fieldMines = createPanelRow("Total mines:", panel);
 
-        JLabel labelRows = new JLabel("Filas:");
-        JTextField fieldRows = new JTextField();
-        JLabel labelColumns = new JLabel("Columnas:");
-        JTextField fieldColumns = new JTextField();
-        JLabel labelMines = new JLabel("Minas:");
-        JTextField fieldMines = new JTextField();
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                panel,
+                "Configure personalized table",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
 
-        // Añadir componentes al panel
-        setPersonalizedPanel1.add(labelRows);
-        setPersonalizedPanel1.add(fieldRows);
-        setPersonalizedPanel1.add(labelColumns);
-        setPersonalizedPanel1.add(fieldColumns);
-        setPersonalizedPanel1.add(labelMines);
-        setPersonalizedPanel1.add(fieldMines);
-        JPanel setPersonalizedPanel = setPersonalizedPanel1;
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int width = Integer.parseInt(fieldWidth.getText());
+                int height = Integer.parseInt(fieldHeight.getText());
+                int mines = Integer.parseInt(fieldMines.getText());
 
-        int result = JOptionPane.showConfirmDialog(null, setPersonalizedPanel, "Configurar Dificultad Personalizada",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-            if (result == JOptionPane.OK_OPTION) {
-                try {
-                    // Recoger valores ingresados
-                    int rows = Integer.parseInt(fieldRows.getText());
-                    int columns = Integer.parseInt(fieldColumns.getText());
-                    int mines = Integer.parseInt(fieldMines.getText());
-
-                    // Validar los valores (ejemplo)
-                    if (rows < 8 || rows > 24 || columns < 8 || columns > 32) {
-                        throw new IllegalArgumentException("Filas y columnas deben estar entre 1 y 50.");
-                    }
-                    if (mines < 1 || mines >= (rows * columns)*0.3) {
-                        throw new IllegalArgumentException("El número de minas debe ser mayor que 0 y menor que el total de celdas.");
-                    }
-
-                    Difficulty.PERSONALIZED.setRows(rows);
-                    Difficulty.PERSONALIZED.setColumns(columns);
-                    Difficulty.PERSONALIZED.setMineCount(mines);
-
-                    setDifficulty(Difficulty.PERSONALIZED);
-
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(null, "Por favor, introduce números válidos.", "Error", JOptionPane.ERROR_MESSAGE);
-                } catch (IllegalArgumentException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                if (!areValidParameters(width, height, mines)) {
+                    showErrorMessage("Please enter valid values." +
+                            "\nThe number of mines must be positive and less than the third of the total number of cells."
+                            +
+                            "\nWidth must be between 8-32." +
+                            "\nHeight must be between 8-24.");
+                } else {
+                    CustomDifficulty personalizedDifficulty = new CustomDifficulty(width, height, mines);
+                    setDifficulty(personalizedDifficulty);
                 }
+            } catch (NumberFormatException e) {
+                showErrorMessage("Please enter valid values.");
             }
+        }
+    }
 
+    private static boolean areValidParameters(int width, int height, int mines) {
+        return (8 <= width && width <= 32) &&
+                (8 <= height && height <= 24) &&
+                (mines > 0 && mines <= (width * height) / 3);
+    }
 
+    private static void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(null,
+                message,
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
 
-
-
-
+    private static JTextField createPanelRow(String text, JPanel panel) {
+        JLabel labelName = new JLabel(text);
+        JTextField fieldName = new JTextField();
+        panel.add(labelName);
+        panel.add(fieldName);
+        return fieldName;
     }
 
     private Component setupGameTimer() {
@@ -242,5 +254,9 @@ public class MainFrame extends JFrame {
         this.difficulty = difficulty;
         adjustWindowSizeBasedOnDifficulty();
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
+
+    public BoardPresenter getPresenter() {
+        return presenter;
     }
 }
