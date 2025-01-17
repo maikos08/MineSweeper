@@ -9,9 +9,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SwingCustomDifficultyDialog implements CustomDifficultyDialog {
+
+
     @Override
     public Difficulty getCustomDifficulty() {
-        throw new UnsupportedOperationException("Unimplemented method 'getCustomDifficulty'");
+      return setPersonalizedTable();
     }
 
 

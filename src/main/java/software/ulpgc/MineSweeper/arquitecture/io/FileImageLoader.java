@@ -10,14 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileImageLoader implements ImageLoader {
-    private static final String DEFAULT_PATH = "images";
     private final Map<String, ImageIcon> images;
     private final File folder;
     private final FileImageDeserializer deserializer;
 
-    public FileImageLoader() {
-        this(DEFAULT_PATH);
-    }
 
     public FileImageLoader(String path) {
         this.folder = new File(path);
@@ -47,7 +43,7 @@ public class FileImageLoader implements ImageLoader {
             byte[] content = Files.readAllBytes(file.toPath());
             Image image = new Image() {
                 @Override
-                public byte[] content() throws IOException {
+                public byte[] content(){
                     return content;
                 }
 
@@ -56,10 +52,6 @@ public class FileImageLoader implements ImageLoader {
                     return file.getAbsolutePath();
                 }
 
-                @Override
-                public java.awt.Image image() {
-                    return null;
-                }
             };
             images.put(file.getName(), deserializer.deserialize(image.content()));
         } catch (IOException e) {
