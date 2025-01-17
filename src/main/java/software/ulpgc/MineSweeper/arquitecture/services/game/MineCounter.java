@@ -31,4 +31,5 @@ public class MineCounter {
         }
         return count;
     }
+
 }

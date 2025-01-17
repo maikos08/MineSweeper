@@ -23,6 +23,8 @@ public class MainFrame extends JFrame {
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
     private Difficulty difficulty = BaseDifficulty.EASY;
+    private final Map<String, Command<Difficulty>> commands;
+
 
     private JPanel boardPanel;
     private SwingTimeDisplay timeDisplay;
@@ -30,6 +32,7 @@ public class MainFrame extends JFrame {
     private JLabel mineAndFlagCounter;
 
     public MainFrame() {
+        this.commands = new HashMap<>();
         setResizable(false);
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
@@ -39,12 +42,12 @@ public class MainFrame extends JFrame {
     private void adjustWindowSizeBasedOnDifficulty() {
         switch (difficulty) {
             case BaseDifficulty.EASY -> {
-                WINDOW_WIDTH = 400;
-                WINDOW_HEIGHT = 510;
+                WINDOW_WIDTH = 288;
+                WINDOW_HEIGHT = 380;
             }
             case BaseDifficulty.MEDIUM -> {
-                WINDOW_WIDTH = 750;
-                WINDOW_HEIGHT = 830;
+                WINDOW_WIDTH = 576;
+                WINDOW_HEIGHT = 690;
             }
             case BaseDifficulty.HARD -> {
                 WINDOW_WIDTH = 1150;
@@ -82,6 +85,7 @@ public class MainFrame extends JFrame {
 
         mineAndFlagCounter = new JLabel("Mines: 10 | Flags: 0", SwingConstants.CENTER);
         mineAndFlagCounter.setPreferredSize(new Dimension(100, 30));
+        mineAndFlagCounter.setOpaque(true);
 
         FlagCounter.getInstance().addListener(this::updateMineAndFlagCounter);
 
@@ -110,92 +114,26 @@ public class MainFrame extends JFrame {
     }
 
     private Component selector() {
-        JComboBox<String> comboBox = new JComboBox<>();
-        comboBox.addItem("Easy");
-        comboBox.addItem("Medium");
-        comboBox.addItem("Hard");
-        comboBox.addItem("Custom");
+        List<String> difficulties = new ArrayList<>();
+        difficulties.add("Easy");
+        difficulties.add("Medium");
+        difficulties.add("Hard");
+        difficulties.add("Personalized");
+        SwingDifficultyDialog swingDifficultyDialog = new SwingDifficultyDialog(difficulties);
 
-        comboBox.addActionListener(new ActionListener() {
+        JComboBox<String> selector = swingDifficultyDialog.getSelector();
+        selector.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedDifficulty = (String) comboBox.getSelectedItem();
-                switch (requireNonNull(selectedDifficulty)) {
-                    case "Easy":
-                        setDifficulty(BaseDifficulty.EASY);
-                        break;
-                    case "Medium":
-                        setDifficulty(BaseDifficulty.MEDIUM);
-                        break;
-                    case "Hard":
-                        setDifficulty(BaseDifficulty.HARD);
-                        break;
-                    case "Custom":
-                        setPersonalizedTable();
-                        break;
-                }
+                Difficulty selectedDifficulty = swingDifficultyDialog.getDifficulty();
+                commands.get("select difficulty").execute(selectedDifficulty);
+                difficulty = selectedDifficulty;
                 initializeGame(difficulty);
+                adjustWindowSizeBasedOnDifficulty();
+                setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
             }
         });
-
-        return comboBox;
-    }
-
-    private void setPersonalizedTable() {
-        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 10));
-
-        JTextField fieldWidth = createPanelRow("Width:", panel);
-        JTextField fieldHeight = createPanelRow("Height:", panel);
-        JTextField fieldMines = createPanelRow("Total mines:", panel);
-
-        int result = JOptionPane.showConfirmDialog(
-                null,
-                panel,
-                "Configure personalized table",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE);
-
-        if (result == JOptionPane.OK_OPTION) {
-            try {
-                int width = Integer.parseInt(fieldWidth.getText());
-                int height = Integer.parseInt(fieldHeight.getText());
-                int mines = Integer.parseInt(fieldMines.getText());
-
-                if (!areValidParameters(width, height, mines)) {
-                    showErrorMessage("Please enter valid values." +
-                            "\nThe number of mines must be positive and less than the third of the total number of cells."
-                            +
-                            "\nWidth must be between 8-32." +
-                            "\nHeight must be between 8-24.");
-                } else {
-                    CustomDifficulty personalizedDifficulty = new CustomDifficulty(width, height, mines);
-                    setDifficulty(personalizedDifficulty);
-                }
-            } catch (NumberFormatException e) {
-                showErrorMessage("Please enter valid values.");
-            }
-        }
-    }
-
-    private static boolean areValidParameters(int width, int height, int mines) {
-        return (8 <= width && width <= 32) &&
-                (8 <= height && height <= 24) &&
-                (mines > 0 && mines <= (width * height) / 3);
-    }
-
-    private static void showErrorMessage(String message) {
-        JOptionPane.showMessageDialog(null,
-                message,
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-    }
-
-    private static JTextField createPanelRow(String text, JPanel panel) {
-        JLabel labelName = new JLabel(text);
-        JTextField fieldName = new JTextField();
-        panel.add(labelName);
-        panel.add(fieldName);
-        return fieldName;
+        return swingDifficultyDialog;
     }
 
     private Component setupGameTimer() {
@@ -248,8 +186,11 @@ public class MainFrame extends JFrame {
         adjustWindowSizeBasedOnDifficulty();
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
-
+    public void put(String name, Command<Difficulty> command){
+        commands.put(name, command);
+    }
     public BoardPresenter getPresenter() {
         return presenter;
     }
+
 }
