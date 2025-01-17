@@ -112,5 +112,4 @@ public class BoardPresenter {
         this.game = newGame;
         display.show(game);
     }
-
 }
