@@ -121,27 +121,26 @@ public class MainFrame extends JFrame {
 
     private Component selector() {
         List<String> difficulties = new ArrayList<>();
-        difficulties.add("EASY");
-        difficulties.add("MEDIUM");
-        difficulties.add("HARD");
-        difficulties.add("PERSONALIZED");
+        difficulties.add("Easy");
+        difficulties.add("Medium");
+        difficulties.add("Hard");
+        difficulties.add("Personalized");
         SwingDifficultyDialog swingDifficultyDialog = new SwingDifficultyDialog(difficulties);
-        swingDifficultyDialog.getSelector().addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() != ItemEvent.SELECTED) return;
-                    Difficulty selectedDifficulty = swingDifficultyDialog.getDifficulty();
-                    commands.get("select difficulty").execute(selectedDifficulty);
-                    difficulty = selectedDifficulty;
-                    initializeGame(difficulty);
-                    adjustWindowSizeBasedOnDifficulty();
-                    setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-                }
+
+        JComboBox<String> selector = swingDifficultyDialog.getSelector();
+        selector.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Difficulty selectedDifficulty = swingDifficultyDialog.getDifficulty();
+                commands.get("select difficulty").execute(selectedDifficulty);
+                difficulty = selectedDifficulty;
+                initializeGame(difficulty);
+                adjustWindowSizeBasedOnDifficulty();
+                setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+            }
         });
         return swingDifficultyDialog;
     }
-
-
 
     private Component setupGameTimer() {
         timeDisplay = SwingTimeDisplay.createWithTimer();

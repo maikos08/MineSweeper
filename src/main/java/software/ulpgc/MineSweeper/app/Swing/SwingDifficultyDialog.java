@@ -31,17 +31,17 @@ public class SwingDifficultyDialog extends JPanel implements SelectDifficultyDia
     public Difficulty getDifficulty() {
 
         switch (difficulties.get(selector.getSelectedIndex())){
-            case "EASY" -> {
+            case "Easy" -> {
                 return BaseDifficulty.EASY;
             }
-            case "MEDIUM" -> {
+            case "Medium" -> {
                 return BaseDifficulty.MEDIUM;
             }
-            case "HARD" -> {
+            case "Hard" -> {
                 return BaseDifficulty.HARD;
             }
-            case "PERSONALIZED" -> {
-                CustomDifficulty customDifficulty = SwingCustomDifficultyDialog.setPersonalizedTable();
+            case "Personalized" -> {
+                Difficulty customDifficulty = SwingCustomDifficultyDialog.setPersonalizedTable();
                 return customDifficulty;
             }
             default -> {
@@ -49,7 +49,6 @@ public class SwingDifficultyDialog extends JPanel implements SelectDifficultyDia
             }
         }
     }
-
     public JComboBox<String> getSelector() {
         return selector;
     }
