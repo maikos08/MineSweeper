@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.requireNonNull;
 
 public class MainFrame extends JFrame {
     private static int WINDOW_WIDTH = 800;
