@@ -1,9 +1,9 @@
 package software.ulpgc.MineSweeper.arquitecture.services.observers;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
-import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
-import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.control.Observer;
+import software.ulpgc.MineSweeper.arquitecture.model.Cell;
+import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
 
 public class GameStatusObserver implements Observer {
     private final BoardPresenter boardPresenter;

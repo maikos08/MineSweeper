@@ -1,7 +1,6 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.model.BaseDifficulty;
-import software.ulpgc.MineSweeper.arquitecture.model.CustomDifficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
