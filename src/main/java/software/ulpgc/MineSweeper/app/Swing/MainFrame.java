@@ -92,6 +92,7 @@ public class MainFrame extends JFrame {
 
         mineAndFlagCounter = new JLabel("Mines: 10 | Flags: 0", SwingConstants.CENTER);
         mineAndFlagCounter.setPreferredSize(new Dimension(100, 30));
+        mineAndFlagCounter.setOpaque(true);
 
         FlagCounter.getInstance().addListener(this::updateMineAndFlagCounter);
 
