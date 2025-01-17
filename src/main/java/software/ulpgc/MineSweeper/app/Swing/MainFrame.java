@@ -7,7 +7,7 @@ import software.ulpgc.MineSweeper.arquitecture.model.BaseDifficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
-import software.ulpgc.MineSweeper.arquitecture.services.FlagCounter;
+import software.ulpgc.MineSweeper.arquitecture.services.game.FlagCounter;
 import software.ulpgc.MineSweeper.arquitecture.services.observers.GameStatusObserver;
 
 import javax.swing.*;

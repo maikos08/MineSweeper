@@ -1,7 +1,6 @@
 package software.ulpgc.MineSweeper.arquitecture.services.game;
 
 import software.ulpgc.MineSweeper.arquitecture.model.Cell;
-import software.ulpgc.MineSweeper.arquitecture.services.FlagCounter;
 
 public class CellToogler {
     public static Cell[][] toggleFlag(int row, int col, Cell[][] cells) {
