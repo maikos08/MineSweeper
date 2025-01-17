@@ -1,6 +1,6 @@
 package software.ulpgc.MineSweeper.arquitecture.model;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
 

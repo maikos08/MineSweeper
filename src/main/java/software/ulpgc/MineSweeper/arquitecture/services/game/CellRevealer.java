@@ -1,8 +1,7 @@
 package software.ulpgc.MineSweeper.arquitecture.services.game;
 
-import software.ulpgc.MineSweeper.arquitecture.model.Cell;
-import software.ulpgc.MineSweeper.arquitecture.services.game.BoardUtils;
 import software.ulpgc.MineSweeper.arquitecture.control.Observer;
+import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 
 import java.util.List;
 

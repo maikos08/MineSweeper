@@ -1,8 +1,6 @@
 package software.ulpgc.MineSweeper.arquitecture.services.game;
 
 import software.ulpgc.MineSweeper.arquitecture.model.Cell;
-import software.ulpgc.MineSweeper.arquitecture.services.game.MineCounter;
-import software.ulpgc.MineSweeper.arquitecture.services.game.MinePlacer;
 
 public class BoardInitializer {
     private static final MinePlacer minePlacer = new MinePlacer();

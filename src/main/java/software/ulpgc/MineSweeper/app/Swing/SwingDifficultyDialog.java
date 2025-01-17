@@ -1,7 +1,6 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.model.BaseDifficulty;
-import software.ulpgc.MineSweeper.arquitecture.model.CustomDifficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
@@ -41,8 +40,7 @@ public class SwingDifficultyDialog extends JPanel implements SelectDifficultyDia
                 return BaseDifficulty.HARD;
             }
             case "Personalized" -> {
-                Difficulty customDifficulty = SwingCustomDifficultyDialog.setPersonalizedTable();
-                return customDifficulty;
+                return new SwingCustomDifficultyDialog().getCustomDifficulty();
             }
             default -> {
                 return null;

@@ -1,13 +1,12 @@
 package software.ulpgc.MineSweeper.arquitecture.control;
 
-import java.awt.geom.Point2D;
-
-
 import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
-import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
 import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
+import software.ulpgc.MineSweeper.arquitecture.view.BoardDisplay;
+
+import java.awt.geom.Point2D;
 
 public class BoardPresenter {
     private final BoardDisplay display;
