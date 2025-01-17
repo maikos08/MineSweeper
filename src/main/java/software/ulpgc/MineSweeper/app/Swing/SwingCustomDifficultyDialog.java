@@ -48,7 +48,7 @@ public class SwingCustomDifficultyDialog implements CustomDifficultyDialog {
             } catch (NumberFormatException e) {
                 showErrorMessage("Please enter valid values.");
             }
-        } else if (result==JOptionPane.CANCEL_OPTION || result==JOptionPane.CLOSED_OPTION) {
+        } else if (result==JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
             return BaseDifficulty.EASY;
         }
         throw new RuntimeException("Couldnt create table");
