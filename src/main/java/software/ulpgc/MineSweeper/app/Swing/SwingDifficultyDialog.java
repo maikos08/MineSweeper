@@ -1,5 +1,7 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
+import software.ulpgc.MineSweeper.arquitecture.model.BaseDifficulty;
+import software.ulpgc.MineSweeper.arquitecture.model.CustomDifficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.view.SelectDifficultyDialog;
 
@@ -7,18 +9,18 @@ import javax.swing.*;
 import java.util.List;
 
 public class SwingDifficultyDialog extends JPanel implements SelectDifficultyDialog {
-    private final List<Difficulty> difficulties;
-    private final JComboBox<Difficulty> selector;
+    private final List<String> difficulties;
+    private final JComboBox<String> selector;
 
-    public SwingDifficultyDialog(List<Difficulty> difficulties) {
+
+    public SwingDifficultyDialog(List<String> difficulties) {
         this.difficulties = difficulties;
         this.add(selector = selector());
     }
 
-    private JComboBox<Difficulty> selector() {
-        JComboBox<Difficulty> comboBox = new JComboBox<>();
-
-        for (Difficulty difficulty : difficulties){
+    private JComboBox<String> selector() {
+        JComboBox<String> comboBox = new JComboBox<>();
+        for (String difficulty : difficulties){
             comboBox.addItem(difficulty);
         }
 
@@ -27,10 +29,28 @@ public class SwingDifficultyDialog extends JPanel implements SelectDifficultyDia
 
     @Override
     public Difficulty getDifficulty() {
-        return difficulties.get(selector.getSelectedIndex());
+
+        switch (difficulties.get(selector.getSelectedIndex())){
+            case "EASY" -> {
+                return BaseDifficulty.EASY;
+            }
+            case "MEDIUM" -> {
+                return BaseDifficulty.MEDIUM;
+            }
+            case "HARD" -> {
+                return BaseDifficulty.HARD;
+            }
+            case "PERSONALIZED" -> {
+                CustomDifficulty customDifficulty = SwingCustomDifficultyDialog.setPersonalizedTable();
+                return customDifficulty;
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
-    public JComboBox<Difficulty> getSelector() {
+    public JComboBox<String> getSelector() {
         return selector;
     }
 }

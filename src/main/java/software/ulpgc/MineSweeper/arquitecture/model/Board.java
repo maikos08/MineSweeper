@@ -114,20 +114,6 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
         return new Board(rows, columns, mineCount, updatedCells, observers);
     }
 
-    public int adjacentMines(int row, int col) {
-        int count = 0;
-        for (int i = row - 1; i <= row + 1; i++) {
-            for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < rows && j >= 0 && j < columns) {
-                    if (cells[i][j].hasMine()) {
-                        count++;
-                    }
-                }
-            }
-        }
-        return count;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
