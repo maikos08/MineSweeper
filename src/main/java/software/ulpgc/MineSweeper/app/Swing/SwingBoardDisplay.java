@@ -55,6 +55,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
 
     private void drawCell(Graphics g, Cell cell, Square square) {
         ImageIcon icon;
+
         if (cell.isRevealed()) {
             if (cell.hasMine() && cell == game.board().cells()[row][col]) {
                 icon = images.get("mineSelected.png");
@@ -93,9 +94,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
                         leftClick.on(new Point(col, row));
                     } else if (SwingUtilities.isRightMouseButton(e)) {
                         rightClick.on(new Point(col, row));
-
                     }
-
                 }
             }
         };
@@ -124,7 +123,7 @@ public class SwingBoardDisplay extends JPanel implements BoardDisplay {
 
     @Override
     public void showLose() {
-        game = game.revealMines();
+        this.game = game.revealMines();
     }
 
     @Override
