@@ -48,9 +48,7 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
 
     public Board updateCell(int row, int col) {
         boolean[][] visited = new boolean[rows][columns];
-        Cell[][] updatedCells = Arrays.stream(cells)
-                .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
-                .toArray(Cell[][]::new);
+        Cell[][] updatedCells = getUpdatedCells();
 
         revealCells(row, col, updatedCells, visited);
 
@@ -98,34 +96,29 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
         }
 
         Cell updatedCell = cell.toggleFlag();
-        Cell[][] updatedCells = Arrays.stream(cells)
-                .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
-                .toArray(Cell[][]::new);
+        Cell[][] updatedCells = getUpdatedCells();
         updatedCells[row][col] = updatedCell;
 
         FlagCounter flagCounter = FlagCounter.getInstance();
 
+        FlagCounterModifier(cell, flagCounter);
+
+        return new Board(rows, columns, mineCount, updatedCells, observers);
+    }
+
+    private Cell[][] getUpdatedCells() {
+        Cell[][] updatedCells = Arrays.stream(cells)
+                .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
+                .toArray(Cell[][]::new);
+        return updatedCells;
+    }
+
+    private void FlagCounterModifier(Cell cell, FlagCounter flagCounter) {
         if (!cell.isFlagged()) {
             flagCounter.addFlag();
         } else {
             flagCounter.removeFlag();
         }
-
-        return new Board(rows, columns, mineCount, updatedCells, observers);
-    }
-
-    public int adjacentMines(int row, int col) {
-        int count = 0;
-        for (int i = row - 1; i <= row + 1; i++) {
-            for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < rows && j >= 0 && j < columns) {
-                    if (cells[i][j].hasMine()) {
-                        count++;
-                    }
-                }
-            }
-        }
-        return count;
     }
 
     @Override
