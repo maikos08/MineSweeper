@@ -4,7 +4,8 @@ public enum Difficulty {
 
     EASY(8, 8, 10),
     MEDIUM(16, 16, 40),
-    HARD(16, 31, 99);
+    HARD(16, 31, 99),
+    PERSONALIZED(20, 20, 20);
 
     private final int rows;
     private final int columns;

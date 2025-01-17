@@ -1,6 +1,7 @@
 package software.ulpgc.MineSweeper.app.Swing;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
+import software.ulpgc.MineSweeper.arquitecture.control.Command;
 import software.ulpgc.MineSweeper.arquitecture.io.FileImageLoader;
 import software.ulpgc.MineSweeper.arquitecture.model.Difficulty;
 import software.ulpgc.MineSweeper.arquitecture.model.Game;
@@ -12,6 +13,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -21,12 +28,14 @@ public class MainFrame extends JFrame {
     private static int WINDOW_HEIGHT = 800;
     private BoardPresenter presenter;
     private Difficulty difficulty = Difficulty.EASY;
+    private final Map<String, Command<Difficulty>> commands;
     private JPanel boardPanel;
     private SwingTimeDisplay timeDisplay;
     private GameTimer gameTimer;
     private JLabel mineAndFlagCounter;
 
     public MainFrame() {
+        this.commands = new HashMap<>();
         setResizable(false);
         adjustWindowSizeBasedOnDifficulty();
         setupMainFrame();
@@ -100,35 +109,26 @@ public class MainFrame extends JFrame {
     }
 
     private Component selector() {
-        JComboBox<String> comboBox = new JComboBox<>();
-        comboBox.addItem("Easy");
-        comboBox.addItem("Medium");
-        comboBox.addItem("Hard");
-        comboBox.addItem("Personalized");
+        List<Difficulty> difficulties = new ArrayList<>();
+        difficulties.add(Difficulty.EASY);
+        difficulties.add(Difficulty.MEDIUM);
+        difficulties.add(Difficulty.HARD);
+        difficulties.add(Difficulty.PERSONALIZED);
 
-        comboBox.addActionListener(new ActionListener() {
+        SwingDifficultyDialog swingDifficultyDialog = new SwingDifficultyDialog(difficulties);
+        swingDifficultyDialog.getSelector().addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                String selectedDifficulty = (String) comboBox.getSelectedItem();
-                switch (requireNonNull(selectedDifficulty)) {
-                    case "Easy":
-                        setDifficulty(Difficulty.EASY);
-                        break;
-                    case "Medium":
-                        setDifficulty(Difficulty.MEDIUM);
-                        break;
-                    case "Hard":
-                        setDifficulty(Difficulty.HARD);
-                        break;
-                    case "Personalized":
-                        // TODO: Implement personalized difficulty
-                        break;
-                }
-                initializeGame(difficulty);
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() != ItemEvent.SELECTED) return;
+                Difficulty selectedDifficulty = (Difficulty) swingDifficultyDialog.getSelector().getSelectedItem();
+                commands.get("select difficulty").execute(selectedDifficulty);
+                difficulty = selectedDifficulty;
+                adjustWindowSizeBasedOnDifficulty();
+                setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
             }
         });
 
-        return comboBox;
+        return swingDifficultyDialog;
     }
 
     private Component setupGameTimer() {
@@ -180,5 +180,13 @@ public class MainFrame extends JFrame {
         this.difficulty = difficulty;
         adjustWindowSizeBasedOnDifficulty();
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
+
+    public void put(String name, Command<Difficulty> command){
+        commands.put(name, command);
+    }
+
+    public BoardPresenter getPresenter() {
+        return presenter;
     }
 }
