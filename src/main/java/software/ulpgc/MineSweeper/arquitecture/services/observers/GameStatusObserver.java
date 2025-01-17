@@ -1,17 +1,15 @@
 package software.ulpgc.MineSweeper.arquitecture.services.observers;
 
 import software.ulpgc.MineSweeper.arquitecture.control.BoardPresenter;
-import software.ulpgc.MineSweeper.arquitecture.model.Game;
 import software.ulpgc.MineSweeper.arquitecture.model.GameStatus;
-import software.ulpgc.MineSweeper.arquitecture.model.Board;
 import software.ulpgc.MineSweeper.arquitecture.model.Cell;
 import software.ulpgc.MineSweeper.arquitecture.control.Observer;
 
-public class GameStatusChecker implements Observer {
+public class GameStatusObserver implements Observer {
     private final BoardPresenter boardPresenter;
     private int revealedCells = 0;
 
-    public GameStatusChecker(BoardPresenter boardPresenter) {
+    public GameStatusObserver(BoardPresenter boardPresenter) {
         this.boardPresenter = boardPresenter;
     }
 
@@ -33,7 +31,7 @@ public class GameStatusChecker implements Observer {
     }
 
     public boolean isWinCondition(){
-        revealedCells++;
+        ++revealedCells;
         int totalCells = boardPresenter.getGame().board().columns() * boardPresenter.getGame().board().rows();
         int minesCount = boardPresenter.getGame().board().mineCount();
         return totalCells == revealedCells + minesCount;

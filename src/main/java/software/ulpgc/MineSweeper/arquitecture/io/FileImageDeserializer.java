@@ -1,13 +1,6 @@
 package software.ulpgc.MineSweeper.arquitecture.io;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.swing.*;
-import java.io.ByteArrayInputStream;
 
 public class FileImageDeserializer implements ImageDeserializer {
     @Override
@@ -19,4 +12,3 @@ public class FileImageDeserializer implements ImageDeserializer {
         }
     }
 }
-

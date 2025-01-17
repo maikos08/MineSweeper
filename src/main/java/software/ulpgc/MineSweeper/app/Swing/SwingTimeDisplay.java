@@ -5,9 +5,8 @@ import software.ulpgc.MineSweeper.arquitecture.model.GameTimer;
 import javax.swing.*;
 import java.awt.*;
 
-
 public class SwingTimeDisplay extends JPanel {
-    private final JLabel timerLabel = new JLabel("Time: 0");
+    private final JLabel timerLabel = new JLabel("Time: 00:00");
     private GameTimer gameTimer;
 
     private SwingTimeDisplay() {
@@ -24,7 +23,13 @@ public class SwingTimeDisplay extends JPanel {
     }
 
     public void updateTime(long seconds) {
-        SwingUtilities.invokeLater(() -> timerLabel.setText("Time: " + seconds));
+        SwingUtilities.invokeLater(() -> timerLabel.setText(formatTime(seconds)));
+    }
+
+    private String formatTime(long seconds) {
+        long minutes = seconds / 60;
+        long remainingSeconds = seconds % 60;
+        return String.format("Time: %02d:%02d", minutes, remainingSeconds);
     }
 
 }

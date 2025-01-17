@@ -2,9 +2,9 @@ package software.ulpgc.MineSweeper.arquitecture.model;
 
 public enum Difficulty {
 
-    EASY(8, 8, 10),       // 8x8 board with 10 mines
-    MEDIUM(16, 16, 40),   // 16x16 board with 40 mines
-    HARD(16, 31, 99);     // 24x24 board with 99 mines
+    EASY(8, 8, 10),
+    MEDIUM(16, 16, 40),
+    HARD(16, 31, 99);
 
     private final int rows;
     private final int columns;

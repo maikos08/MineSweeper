@@ -63,7 +63,7 @@ public class FileImageLoader implements ImageLoader {
             };
             images.put(file.getName(), deserializer.deserialize(image.content()));
         } catch (IOException e) {
-            System.err.println("Error loading image: " + file.getName());
+            throw new RuntimeException("Error reading image file: " + file.getAbsolutePath(), e);
         }
     }
 

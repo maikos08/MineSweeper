@@ -1,10 +1,10 @@
 package software.ulpgc.MineSweeper.arquitecture.model;
 
 import software.ulpgc.MineSweeper.arquitecture.control.Observer;
+import software.ulpgc.MineSweeper.arquitecture.services.FlagCounter;
 import software.ulpgc.MineSweeper.arquitecture.services.game.MineCounter;
 import software.ulpgc.MineSweeper.arquitecture.services.game.MinePlacer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +16,8 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
     public Board(int rows, int columns, int mineCount, List<Observer> observers) {
         this(rows, columns, mineCount, initializeCells(rows, columns, mineCount), observers);
 
-        System.out.println(this);
+        FlagCounter flagCounter = FlagCounter.getInstance();
+        flagCounter.setMines(mineCount);
     }
 
     public Board(int rows, int columns, int mineCount, int avoidRow, int avoidCol, List<Observer> observers) {
@@ -80,6 +81,16 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
         }
     }
 
+    private void notifyObservers(Cell cell) {
+        for (Observer observer : observers) {
+            observer.notify(cell);
+        }
+    }
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
     public Board setFlag(int row, int col) {
         Cell cell = cells[row][col];
         if (cell.isRevealed()) {
@@ -91,6 +102,14 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
                 .map(rowCells -> Arrays.copyOf(rowCells, rowCells.length))
                 .toArray(Cell[][]::new);
         updatedCells[row][col] = updatedCell;
+
+        FlagCounter flagCounter = FlagCounter.getInstance();
+
+        if (!cell.isFlagged()) {
+            flagCounter.addFlag();
+        } else {
+            flagCounter.removeFlag();
+        }
 
         return new Board(rows, columns, mineCount, updatedCells, observers);
     }
@@ -128,17 +147,7 @@ public record Board(int rows, int columns, int mineCount, Cell[][] cells, List<O
                     cells[i][j] = new Cell(cells[i][j].hasMine(), false, true, cells[i][j].adjacentMines());
             }
         }
-
         return new Board(rows, columns, mineCount, cells, observers);
     }
 
-    public void addObserver(Observer observer){
-        observers.add(observer);
-    }
-
-    private void notifyObservers(Cell cell){
-        for (Observer observer : observers){
-            observer.notify(cell);
-        }
-    }
 }
